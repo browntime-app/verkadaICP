@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICP Framework — VerkadaWin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f5f7;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: #0f0f0f;
+      color: #fff;
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-title { font-size: 14px; font-weight: 700; }
+    .topbar-badge {
+      font-size: 10px;
+      font-weight: 600;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #aaa;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .btn-print {
+      background: #fff;
+      color: #0f0f0f;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-print:hover { background: #e5e7eb; }
+
+    /* ── ICP Nav ── */
+    .icp-nav {
+      background: #fff;
+      border-bottom: 2px solid #e8e8e8;
+      padding: 0 20px;
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      position: sticky;
+      top: 52px;
+      z-index: 40;
+    }
+    .icp-tab {
+      padding: 14px 18px 12px;
+      border: none;
+      background: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: #999;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -2px;
+    }
+    .icp-tab:hover { color: #333; }
+    .icp-tab.active { color: var(--tc); border-bottom-color: var(--tc); }
+
+    /* ── ICP Panel ── */
+    .icp-panel { display: none; }
+    .icp-panel.active { display: block; }
+
+    /* ── ICP Header ── */
+    .icp-header {
+      padding: 26px 24px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .icp-header::after {
+      content: '';
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .icp-header-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+    }
+    .icp-header-name {
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+      line-height: 1.1;
+    }
+    .icp-header-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.75);
+      font-weight: 400;
+    }
+    .icp-header-meta {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .icp-meta-chip {
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.9);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ── Grid ── */
+    .icp-grid {
+      display: grid;
+      grid-template-columns: 290px 1fr 230px;
+      grid-template-areas:
+        "desc     metrics    why"
+        "char     discovery  why"
+        "examples personas   personas"
+        ".        plays      opp"
+        "battle   battle     battle"
+        "products products   products";
+      gap: 10px;
+      padding: 14px 18px 36px;
+      align-items: start;
+    }
+
+    /* ── Cards ── */
+    .card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+    .ch {
+      padding: 10px 14px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .ch-icon { font-size: 14px; line-height: 1; }
+    .ch-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+    .ch-sub { font-size: 10px; opacity: 0.75; margin-top: 1px; }
+    .cb { background: #fff; padding: 14px 16px; }
+
+    /* Card area assignments */
+    .c-desc     { grid-area: desc; }
+    .c-metrics  { grid-area: metrics; }
+    .c-why      { grid-area: why; }
+    .c-char     { grid-area: char; }
+    .c-personas { grid-area: personas; }
+    .c-examples { grid-area: examples; }
+    .c-plays    { grid-area: plays; }
+    .c-opp      { grid-area: opp; }
+    .c-products { grid-area: products; }
+
+    /* Card header colors */
+    .hd-teal    { background: #0e7490; }
+    .hd-teal2   { background: #0f766e; }
+    .hd-slate   { background: #374151; }
+    .hd-blue    { background: #1d4ed8; }
+    .hd-indigo  { background: #4338ca; }
+    .hd-purple  { background: #6d28d9; }
+    .hd-dark    { background: #1e3a5f; }
+    .hd-gray    { background: #4b5563; }
+
+    /* ── List styles ── */
+    .blist { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .blist li {
+      font-size: 12.5px;
+      color: #374151;
+      line-height: 1.5;
+      padding-left: 14px;
+      position: relative;
+    }
+    .blist li::before {
+      content: '+';
+      position: absolute;
+      left: 0;
+      font-weight: 800;
+      color: #9ca3af;
+    }
+    .blist li strong { color: #111; }
+
+    /* ── Example pills ── */
+    .ex-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ex-pill {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    /* ── Personas ── */
+    .personas-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .persona-card {
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
+      border-radius: 10px;
+      padding: 16px 10px 14px;
+      text-align: center;
+    }
+    .p-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 auto 10px;
+    }
+    .p-num {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7c3aed;
+      margin-bottom: 3px;
+    }
+    .p-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #111;
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+    .p-dept {
+      font-size: 10px;
+      color: #888;
+      line-height: 1.3;
+    }
+
+    /* ── Customer Plays ── */
+    .play-list { display: flex; flex-direction: column; gap: 8px; }
+    .play-item {
+      font-size: 12px;
+      color: #374151;
+      padding: 8px 10px 8px 12px;
+      background: #f9fafb;
+      border-radius: 6px;
+      border-left: 3px solid #9ca3af;
+      line-height: 1.4;
+    }
+    .play-name { font-weight: 700; color: #111; display: block; margin-bottom: 2px; }
+
+    /* ── Opportunity ── */
+    .opp-list { display: flex; flex-direction: column; gap: 7px; }
+    .opp-item {
+      font-size: 12px;
+      color: #374151;
+      line-height: 1.4;
+      padding-left: 14px;
+      position: relative;
+    }
+    .opp-item::before { content: '→'; position: absolute; left: 0; color: #60a5fa; font-weight: 700; }
+
+    /* ── Products bar ── */
+    .products-bar {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+    .prod-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-right: 4px;
+    }
+    .prod-chip {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .prod-note {
+      margin-left: auto;
+      font-size: 10px;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    /* ── Discovery ── */
+    .hd-cyan { background: #0369a1; }
+    .c-discovery { grid-area: discovery; }
+    .q-list { display: flex; flex-direction: column; gap: 7px; }
+    .q-item {
+      font-size: 12.5px;
+      color: #1e3a5f;
+      line-height: 1.5;
+      padding: 8px 12px;
+      background: #eff6ff;
+      border-radius: 6px;
+      border-left: 3px solid #2563eb;
+      font-style: italic;
+    }
+    .q-item strong { font-style: normal; color: #1d4ed8; }
+
+    /* ── Compete ── */
+    .hd-black { background: #111827; }
+    .c-battle { grid-area: battle; }
+    .compete-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .compete-col-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f3f4f6;
+    }
+    .compete-vs {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #dc2626;
+      background: #fee2e2;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+    .compete-name { font-size: 13px; font-weight: 800; color: #111; }
+    .compete-win {
+      font-size: 11px;
+      font-weight: 600;
+      color: #059669;
+      background: #d1fae5;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    .compete-list { display: flex; flex-direction: column; gap: 6px; }
+    .compete-item {
+      font-size: 12px;
+      color: #374151;
+      line-height: 1.45;
+      padding-left: 16px;
+      position: relative;
+    }
+    .compete-item::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      font-weight: 700;
+      color: #059669;
+      font-size: 11px;
+    }
+    .compete-item strong { color: #111; }
+
+    /* ── Print ── */
+    @media print {
+      .topbar, .icp-nav { display: none !important; }
+      .icp-panel { display: block !important; page-break-after: always; }
+      body { background: #fff; }
+      .icp-grid { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-title">ICP Framework</span>
+    <span class="topbar-badge">Mid-Market · SLC &amp; Chicago</span>
+  </div>
+  <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<div class="icp-nav" id="icp-nav"></div>
+<div id="icp-panels"></div>
+
+<script>
+const ICPs = [
+  {
+    id: 'district',
+    name: '"The District"',
+    subtitle: 'Multi-Location K-12 School Districts',
+    color: '#1d4ed8',
+    chips: ['5–25 Campuses', '3K–15K Students', '$50M–$200M Budget'],
+    description: [
+      'School districts operating <strong>5–25 campuses</strong> across a geographic region — elementary, middle, and high school',
+      'Security decisions are triggered by a <strong>safety incident or aging DVR infrastructure</strong> and involve the district board, Facilities, IT, and Safety teams simultaneously',
+      '<strong>Budget-constrained buyers</strong> with annual capital cycles — the 10-year warranty story and Clery Act / Title IX compliance documentation land hard here',
+      'Winning play: replace fragmented DVRs with one cloud platform — <strong>one-tap smartphone lockdown</strong> across all campuses, Face Blur for student footage sharing, and Verkada Guest visitor screening against sex offender registries, all out of the box',
+    ],
+    characteristics: [
+      '5–25 school campuses, often across multiple cities/ZIP codes',
+      'Aging DVR infrastructure — 10+ years old, no central visibility across buildings',
+      'Small or zero dedicated IT staff for physical security support',
+      'Annual capital budget cycle (spring decision, fall deployment)',
+      'State mandates and insurance carriers increasingly requiring security upgrades',
+      'Multi-stakeholder purchase: Facilities, IT, Safety Director, and School Board approval',
+    ],
+    examples: [
+      'Granite School District (UT)',
+      'Canyons School District (UT)',
+      'Waukesha School District (WI)',
+      'Andrews ISD (TX)',
+      'Evanston Township HSD (IL)',
+      'Naperville CUSD 203 (IL)',
+    ],
+    metrics: [
+      'Incident response time: <strong>&lt;5 min</strong> (vs. 30+ min with legacy DVR)',
+      'Footage retrieval success rate: <strong>&gt;95%</strong> — no more "footage failed to record"',
+      'Multi-campus visibility: <strong>100% of schools</strong> on one dashboard',
+      'Lockdown response: measurable reduction in seconds, not minutes',
+      'Staff investigation hours saved: <strong>10+ hrs/month</strong>',
+      '3-year TCO lower than DVR + integrator replacement cost',
+    ],
+    why: [
+      '<strong>One-tap campus lockdown from any smartphone</strong> — instantly secure all critical exterior doors across every campus simultaneously; no desk, no delay, no separate phone tree',
+      '<strong>Verkada Guest screens every visitor</strong> against sex offender registries in real time — front office staff get an alert before a flagged visitor is buzzed through',
+      '<strong>Face Blur for evidence sharing</strong> — share footage with law enforcement or parents while automatically protecting student identity; no manual redaction required',
+      '<strong>Air quality sensors detect vaping</strong> in restrooms and alert administrators instantly — no camera in private spaces, no privacy concerns',
+      '<strong>Clery Act &amp; Title IX compliance</strong> — automated incident logs and visitor records reduce manual reporting burden and protect the district in investigations',
+      '<strong>10-year warranty</strong> eliminates capital replacement volatility — districts stop budgeting for DVR refreshes and can present a predictable 10-year infrastructure cost to the board',
+    ],
+    personas: [
+      { abbr: 'SUPT', title: 'Superintendent', dept: 'District Administration', color: '#1d4ed8' },
+      { abbr: 'DPS', title: 'Dir. of Public Safety', dept: 'Safety & Security', color: '#dc2626' },
+      { abbr: 'FAC', title: 'Dir. of Facilities', dept: 'Operations / Facilities', color: '#d97706' },
+      { abbr: 'ITD', title: 'IT Director / CIO', dept: 'Information Technology', color: '#2563eb' },
+    ],
+    plays: [
+      { name: 'DVR Modernization', desc: 'Aging infrastructure play — lead with 10-yr warranty + 3-yr TCO comparison vs. DVR replacement cycle' },
+      { name: 'Lockdown Integration', desc: 'Safety-first play — lead with AI person search + single-tap lockdown across all campuses' },
+      { name: 'New Campus Rollout', desc: 'Construction or expansion play — standardize security before day one' },
+    ],
+    opp: [
+      'SLC: Granite, Canyons, Davis districts — 300+ campuses across territory',
+      'Chicago: Evanston, Naperville, Skokie suburban districts — 20–50 schools each',
+      'Sweet spot: 5–25 campus districts with full budget authority (no enterprise bureaucracy)',
+    ],
+    discovery: [
+      '"Walk me through what happens the moment a safety incident is reported at one of your schools — how does your team get footage, and how long does that actually take?"',
+      '"If you needed to initiate a lockdown across all your campuses right now, how many steps does that take — and where\'s the weakest link in that chain?"',
+      '"How many separate camera or DVR systems are you managing across your buildings, and when are those systems coming up for their next replacement cycle?"',
+      '"Has your district ever had a situation where footage was unavailable or corrupted when you needed it for an investigation or a parent meeting? What was the fallout?"',
+      '"How much time does your safety team spend each month pulling footage for incident investigations versus doing actual proactive safety work?"',
+      '"When your board or insurance carrier asks about your security posture, what\'s the honest answer — and what keeps you up at night about it?"',
+    ],
+    compete: [
+      {
+        name: 'Genetec / Milestone',
+        win: 'Simplicity wins',
+        bullets: [
+          '<strong>Genetec requires a dedicated IT admin</strong> to maintain Security Center — most K-12 districts don\'t have one',
+          'Multi-module licensing (video, access, alarms all separate) vs. Verkada\'s unified, zero-server Command',
+          'Footage retrieval requires trained IT support; <strong>Verkada AI search is built for principals and staff</strong>',
+          'No 10-year warranty — districts budget for DVR/NVR replacements every 5–7 years',
+        ],
+      },
+      {
+        name: 'Avigilon (Motorola)',
+        win: 'No servers needed',
+        bullets: [
+          'Avigilon ACC requires on-premise NVR servers and integrator maintenance at every campus',
+          '<strong>No unified platform</strong> — cameras and access control (Avigilon Unity) are separate systems with separate logins',
+          'Higher integrator dependency for deployment and changes vs. Verkada\'s plug-and-play',
+          'Multiple acquisitions/rebrands create product uncertainty; Verkada is a single focused platform',
+        ],
+      },
+      {
+        name: 'Legacy DVR / Integrator SQ',
+        win: 'Cloud visibility wins',
+        bullets: [
+          '<strong>DVRs fail without warning</strong> — footage loss is discovered only when you need it most',
+          'Each campus has its own DVR; principal or custodian must physically retrieve every clip',
+          'Integrator maintenance contracts add $5K–$20K/year per school with no performance guarantee',
+          'No AI search, no lockdown integration, no mobile access — investigation takes 30+ minutes per incident',
+        ],
+      },
+    ],
+    products: [
+      { name: 'Video Security', color: '#2563eb', bg: '#dbeafe' },
+      { name: 'Access Control', color: '#16a34a', bg: '#dcfce7' },
+      { name: 'Intercom', color: '#7c3aed', bg: '#ede9fe' },
+      { name: 'Alarms', color: '#dc2626', bg: '#fee2e2' },
+      { name: 'Visitor Mgmt', color: '#0891b2', bg: '#cffafe' },
+    ],
+  },
+  {
+    id: 'health',
+    name: '"The Health System"',
+    subtitle: 'Regional Healthcare Networks & Large Hospitals',
+    color: '#059669',
+    chips: ['3–8 Hospitals', '400–800 Beds', '$100M–$500M Revenue'],
+    description: [
+      'Regional hospital networks (3–8 hospitals) or large standalone facilities with <strong>400–800 beds</strong> and $100M–$500M+ revenue',
+      'Security is driven by <strong>workplace violence incidents, Joint Commission accreditation requirements</strong>, and a staff retention crisis — 61% of healthcare workers report experiencing aggression',
+      'Clinical teams require <strong>patient fall monitoring, infant abduction prevention, and medication vault security</strong> — physical security and patient care are inseparable here',
+      'Decision involves Security, Facilities, Nursing/Clinical leadership, and CISO — all simultaneously, all with different requirements; HIPAA touches every technology purchase',
+    ],
+    characteristics: [
+      'Multi-building, multi-wing environments requiring granular access control by department',
+      'HIPAA compliance requirements touch every technology purchase decision',
+      'Behavioral health and Emergency Department units carry the highest workplace violence risk',
+      'IT/CISO concerned about IoT network security; clinical teams concerned about operational disruption',
+      'Joint Commission accreditation audits drive security documentation requirements',
+      'High staff turnover in high-risk units — safety environment directly impacts RN retention',
+    ],
+    examples: [
+      'El Centro Regional Medical Center (CA)',
+      'University of Utah Health (UT)',
+      'Intermountain Healthcare (UT)',
+      'Advocate Health (IL)',
+      'NorthShore University HealthSystem (IL)',
+      'Behavioral health networks (peak WPV risk)',
+    ],
+    metrics: [
+      'Workplace violence: <strong>83% reduction</strong> documented (El Centro benchmark)',
+      'Staff safety perception: measurable improvement in employee safety surveys',
+      'Investigation time: <strong>&lt;15 min</strong> to retrieve evidence (vs. days with legacy systems)',
+      'Compliance documentation: <strong>100% audit-ready</strong> for Joint Commission reviews',
+      'Annual cost per bed lower than multi-vendor fragmented setup',
+      'Staff retention: correlation between safety rollout and reduced RN turnover in high-risk units',
+    ],
+    why: [
+      '<strong>Patient fall &amp; aggression monitoring</strong> — care staff monitor patient rooms remotely via AI-enabled cameras that alert in seconds; no dedicated monitoring station required',
+      '<strong>Panic buttons at nurses\' stations</strong> — a single press triggers cameras, alarms, and a security alert simultaneously; faster than radio coordination in an active incident',
+      '<strong>Infant abduction prevention</strong> — access control and sensors integrate directly with infant protection systems to safeguard labor &amp; delivery and NICU units',
+      '<strong>HIPAA-compliant selective blurring</strong> — share footage for investigations while automatically protecting patient privacy; tiered role-based permissions with a full audit trail for Joint Commission reviews',
+      '<strong>Medication vault &amp; pharmacy security</strong> — integrated access control and camera correlation for controlled substance storage areas; event logs ready for DEA or accreditation review',
+      'Documented case study: <strong>83% workplace violence reduction</strong> at El Centro Regional Medical Center — unified cameras, access control, intercoms, and alarms acting as one system',
+    ],
+    personas: [
+      { abbr: 'CSO', title: 'Corporate Security Dir.', dept: 'Security & Asset Protection', color: '#dc2626' },
+      { abbr: 'EPD', title: 'Emergency Prep. Director', dept: 'Clinical Safety', color: '#059669' },
+      { abbr: 'CNO', title: 'Dir. of Nursing / CNO', dept: 'Clinical / Nursing', color: '#d97706' },
+      { abbr: 'CIS', title: 'CISO / IT Director', dept: 'Information Technology', color: '#2563eb' },
+    ],
+    plays: [
+      { name: 'Workplace Violence Prevention', desc: 'Lead with 83% reduction benchmark + AI repeat offender identification — driven by safety incident or regulatory pressure' },
+      { name: 'Multi-Vendor Consolidation', desc: 'Replace 3–5 fragmented security vendors with one integrated platform; reduce support overhead and investigation time' },
+      { name: 'New Facility / Wing', desc: 'Construction project play — fully integrated security infrastructure from day one' },
+    ],
+    opp: [
+      'SLC: Intermountain Healthcare, University of Utah Health — major regional multi-hospital systems',
+      'Chicago: Northwestern, U of Chicago, Advocate, Loyola — large urban hospital networks with high WPV exposure',
+      'Behavioral health networks are the highest-urgency, least-served mid-market segment',
+    ],
+    discovery: [
+      '"In your last significant workplace violence incident, how long did it take from the triggering event to having usable footage in hand for HR or law enforcement?"',
+      '"Do your cameras, access control, and alarms currently talk to each other — or does your team have to manually coordinate three separate systems during an active threat?"',
+      '"How do you currently identify and flag a patient or visitor who was aggressive during a prior visit before they can walk back into your ED or behavioral health unit?"',
+      '"If your CISO asked today to produce an audit trail of who accessed sensitive security footage over the last 90 days, how quickly could you generate that report?"',
+      '"What would a 50% reduction in workplace violence incidents mean specifically for nursing retention in your highest-risk units?"',
+      '"What\'s your current process for immediately revoking a terminated employee\'s access across every building and every door — and how confident are you that it\'s airtight?"',
+    ],
+    compete: [
+      {
+        name: 'Genetec / Milestone',
+        win: 'Faster response wins',
+        bullets: [
+          'Genetec Security Center requires IT-managed on-premise infrastructure + complex RBAC configuration for healthcare',
+          '<strong>Multi-vendor approach</strong> (Genetec video + separate access + separate intercom) means slower threat response in a WPV incident',
+          'Investigation requires trained operators; <strong>Verkada\'s mobile app is built for anyone to use in a crisis</strong>',
+          'No integrated repeat-offender AI — flagging a known aggressor across facilities requires manual cross-referencing',
+        ],
+      },
+      {
+        name: 'Avigilon (Motorola)',
+        win: 'Unified platform wins',
+        bullets: [
+          'Avigilon AI analytics require expensive on-premise GPU servers — high upfront cost, complex IT maintenance at every hospital',
+          'No integrated intercom or alarm management — a full security suite still requires additional vendors',
+          'Parent company (Motorola) focuses on law enforcement/public safety, <strong>not healthcare-specific WPV workflows</strong>',
+          'Deployment at multi-building hospital campuses requires months of professional integrator configuration',
+        ],
+      },
+      {
+        name: 'Legacy Multi-Vendor Setup',
+        win: 'Integration wins',
+        bullets: [
+          '<strong>Cameras, access control, intercoms, and alarms from 3–5 vendors don\'t communicate</strong> — incident response requires checking each system manually',
+          'No unified event timeline; reconstructing a WPV incident requires hours of cross-referencing footage and badge logs',
+          'HIPAA documentation of who accessed footage requires manual audit trail; legacy systems have no access log',
+          'No mobile access — security must physically return to monitoring station to review footage or trigger lockdown',
+        ],
+      },
+    ],
+    products: [
+      { name: 'Video Security', color: '#2563eb', bg: '#dbeafe' },
+      { name: 'Access Control', color: '#16a34a', bg: '#dcfce7' },
+      { name: 'Intercom', color: '#7c3aed', bg: '#ede9fe' },
+      { name: 'Alarms', color: '#dc2626', bg: '#fee2e2' },
+      { name: 'Air Quality', color: '#0891b2', bg: '#cffafe' },
+    ],
+  },
+  {
+    id: 'merchant',
+    name: '"The Merchant"',
+    subtitle: 'Regional Retail Chains & Franchise Networks',
+    color: '#dc2626',
+    chips: ['15–100+ Locations', '$50M–$300M Revenue', 'Shrinkage-Driven'],
+    description: [
+      'Regional or emerging national retail chains with <strong>15–100+ locations</strong> and $50M–$300M in revenue',
+      'Security is driven by <strong>shrinkage losses ($100K–$500K+ annually) and organized retail crime (ORC)</strong> hitting multiple locations simultaneously',
+      'Buyers are loss prevention and operations — but the <strong>CFO approves based on ROI</strong>; the LP Director approves based on People of Interest and LPOI alerting across every door',
+      'Winning play: replace store-level DVRs with a cloud platform LP can manage from HQ or a phone — POI/LPOI alerts fire the instant a known bad actor enters any store in the chain',
+    ],
+    characteristics: [
+      '15–100+ store or franchise locations across a geographic region',
+      'Shrinkage is a direct P&L impact — every point of gross margin at stake',
+      'Store-level DVRs provide zero cross-location visibility: ORC suspects move freely between stores',
+      'POS integration is a key requirement — correlate transaction anomalies with video timestamps automatically',
+      'District/regional managers need mobile access; cannot physically be in every location',
+      'High-value merchandise categories: luxury, electronics, outdoor/sporting goods, specialty retail',
+    ],
+    examples: [
+      'Canadian Tire franchises (50% shrinkage reduction documented)',
+      'Harry Rosen (19-location luxury retail chain)',
+      'Regional grocery chains (15–50 stores)',
+      'Outdoor/sporting goods retailers',
+      'QSR franchise networks (50–100 locations)',
+      'Specialty electronics / accessories retailers',
+    ],
+    metrics: [
+      'Shrinkage $ reduction: <strong>50% reduction</strong> documented (Canadian Tire benchmark)',
+      'Incident investigation time: <strong>&lt;15 min</strong> per incident (vs. hours with local DVR)',
+      'Repeat offender identification: # of ORC suspects flagged and prosecuted per quarter',
+      'Cost per location per month vs. legacy DVR + monitoring contract',
+      'ROI payback period: <strong>&lt;3 years</strong> from shrinkage savings alone',
+      'Cross-store pattern detection: # of multi-location theft incidents linked',
+    ],
+    why: [
+      '<strong>People of Interest (POI) alerts</strong> — flag known shoplifters by face; receive an instant SMS or email the moment they enter any store in the chain, before they reach the sales floor',
+      '<strong>License Plates of Interest (LPOI) alerts</strong> — auto-flag known ORC vehicles as they enter your parking lots; front-of-store alert fires before suspects even walk in',
+      '<strong>Single dashboard across all stores</strong> — loss prevention monitors every location simultaneously from HQ or mobile; one login, one Command platform, zero travel required',
+      '<strong>POS integration</strong> — suspicious transactions (voids, no-receipt returns) auto-correlated with video timestamps; no manual investigation required to connect the register to the footage',
+      '<strong>Cloud-based investigation</strong> — pull footage from any store on your phone in minutes, without dispatching someone to pull a local DVR',
+      'Documented benchmark: <strong>50% shrinkage reduction</strong> at Canadian Tire — sub-3-year ROI payback period, CFO-ready story',
+    ],
+    personas: [
+      { abbr: 'DAP', title: 'Dir. of Asset Protection', dept: 'Loss Prevention / AP', color: '#dc2626' },
+      { abbr: 'LPM', title: 'Loss Prevention Manager', dept: 'Asset Protection', color: '#d97706' },
+      { abbr: 'CFO', title: 'CFO / Finance Director', dept: 'Finance / Corporate', color: '#16a34a' },
+      { abbr: 'ITD', title: 'IT Director', dept: 'Information Technology', color: '#2563eb' },
+    ],
+    plays: [
+      { name: 'Shrinkage Reduction ROI', desc: 'Lead with Canadian Tire 50% reduction + payback period calculation — CFO sign-off play' },
+      { name: 'ORC Cross-Store Visibility', desc: 'Show how AI person search links ORC suspects across all locations simultaneously — LP urgency play' },
+      { name: 'New Store Rollout', desc: 'Expansion play — plug-and-play standardization as new locations open (hours to deploy, not weeks)' },
+    ],
+    opp: [
+      'SLC: Outdoor/sporting goods chains; regional grocery; franchise networks (growing market)',
+      'Chicago: Luxury North Shore retail; large QSR franchise operators; specialty retail HQs',
+      'ORC task forces and state legislation are creating non-discretionary upgrade events',
+    ],
+    discovery: [
+      '"Today, if your LP team gets a tip that a known ORC suspect just hit one of your stores — how fast can they pull that footage, and can they see if the same person appeared at any other location?"',
+      '"What percentage of your shrinkage do you currently attribute to organized retail crime versus employee theft versus vendor fraud — and how confident are you in that split?"',
+      '"Walk me through what a theft investigation looks like today — from the moment it\'s reported to having something you can hand to law enforcement. What\'s the biggest time sink?"',
+      '"Do you have any way right now to correlate a suspicious POS transaction — a void, a return with no receipt — to the video from that exact register at that exact moment?"',
+      '"If you open 10 new stores next year, what does security deployment look like per store — and what\'s the timeline and cost to get each one fully operational?"',
+      '"Has your CFO asked you to put a dollar figure on your loss prevention ROI? If you could cut shrinkage by 40–50%, what does that mean for your gross margin?"',
+    ],
+    compete: [
+      {
+        name: 'Eagle Eye Networks',
+        win: 'AI + hardware wins',
+        bullets: [
+          'Eagle Eye is cloud-first but <strong>camera-only</strong> — no integrated access control, intercoms, or alarms for the full store security suite',
+          'No native People of Interest AI alerting across stores — cross-location ORC tracking requires third-party add-on',
+          'Less proven hardware reliability; <strong>Verkada\'s 10-year warranty is unmatched in the market</strong>',
+          'Cross-store investigation is more manual; Verkada\'s AI search across all locations is significantly faster',
+        ],
+      },
+      {
+        name: 'Avigilon (Motorola)',
+        win: 'Cloud investigation wins',
+        bullets: [
+          '<strong>Avigilon AI requires on-premise GPU servers at each store</strong> — prohibitively expensive across 50+ locations',
+          'Loss prevention must access each store\'s local NVR; no true cloud-based cross-store investigation from HQ',
+          'POS integration requires custom development and integrator support; <strong>Verkada\'s POS integration is out-of-the-box</strong>',
+          'Higher cost per store factoring in NVR hardware + annual software licensing + integrator maintenance',
+        ],
+      },
+      {
+        name: 'Legacy DVR / Store-Level SQ',
+        win: 'Cross-store visibility wins',
+        bullets: [
+          'Store-level DVRs mean <strong>LP is completely blind to other locations</strong> — ORC suspects freely hit multiple stores undetected',
+          'Investigation requires physically dispatching someone to pull footage from the back-office DVR in each store',
+          'No AI search — manually reviewing 8+ hours of footage per incident to find a 5-minute event',
+          '<strong>No POS integration</strong> — transaction anomalies and video footage cannot be correlated without manual effort',
+        ],
+      },
+    ],
+    products: [
+      { name: 'Video Security', color: '#2563eb', bg: '#dbeafe' },
+      { name: 'Access Control', color: '#16a34a', bg: '#dcfce7' },
+      { name: 'Alarms', color: '#dc2626', bg: '#fee2e2' },
+    ],
+  },
+  {
+    id: 'portfolio',
+    name: '"The Portfolio"',
+    subtitle: 'Property Management & Multifamily Real Estate',
+    color: '#7c3aed',
+    chips: ['50–200 Properties', '1M–13M+ Sq Ft', 'Vendor Consolidation'],
+    description: [
+      'Large property management companies with <strong>50–200 properties</strong> (commercial, multifamily, or mixed-use) and $50M–$200M+ revenue',
+      'Security is driven by <strong>tenant safety, liability reduction, and the operational burden</strong> of managing 3–5 fragmented vendors across a large portfolio',
+      'Property managers are non-technical — security must be <strong>self-service, not IT-dependent</strong>; IT tickets for access control changes are a dealbreaker',
+      'Winning play: replace per-property fragmentation with one cloud platform that standardizes security across the entire portfolio without IT overhead',
+    ],
+    characteristics: [
+      '50–200 managed properties across a region — each currently on a different security vendor',
+      'High tenant turnover drives constant access control onboarding and offboarding demands',
+      'Property managers lack technical expertise — must manage security without IT tickets',
+      'Capital replacement cycles are unpredictable and costly with legacy DVR/NVR infrastructure',
+      'Liability exposure from security incidents (trespassing, assault, slip-and-falls) drives urgency',
+      'Portfolio acquisition activity means new properties must be standardized quickly',
+    ],
+    examples: [
+      'BNE Real Estate Group (1M+ sq ft commercial/multifamily)',
+      'Colonnade BridgePort (170 properties, 13M+ sq ft)',
+      'Self-storage networks (10–30 locations)',
+      'Multifamily operators (500+ units across properties)',
+      'Mixed-use development companies',
+      'Commercial real estate office park operators',
+    ],
+    metrics: [
+      'Deployment speed: <strong>1 week per property</strong> (vs. 2–3 months for legacy install)',
+      'Portfolio standardization: <strong>100% of properties</strong> on one unified platform',
+      'Monthly OpEx reduction: savings from eliminating DVR maintenance + NVR replacements',
+      'Tenant onboarding time: <strong>&lt;1 day</strong> (vs. 1+ week with legacy access control)',
+      'Vendor consolidation: reduce from <strong>3–5 vendors to 1</strong> platform and contract',
+      'Incident investigation: <strong>&lt;10 min</strong> across any property in the portfolio',
+    ],
+    why: [
+      '<strong>One platform across 50–200 properties</strong> — Verkada\'s hybrid cloud eliminates local NVR/DVR servers at every site; one login, one Command dashboard, full portfolio visibility',
+      '<strong>Plug-and-play PoE in 1 week</strong> per property — no infrastructure build-out, no integrator, no port-forwarding; cameras and readers connect via standard network switch',
+      '<strong>Self-service access control</strong> — property managers onboard tenants, grant vendor access, and offboard without IT tickets; all managed from the Command dashboard or mobile app',
+      '<strong>Proactive real-time alerts</strong> — instant SMS or email for loitering, Persons of Interest, or door tampering across any property; security responds from anywhere without returning to a monitoring station',
+      '<strong>10-year warranty</strong> eliminates capital replacement volatility across a large portfolio — predictable CapEx with automatic firmware updates, no NVR lifecycle to budget for',
+    ],
+    personas: [
+      { abbr: 'COO', title: 'COO / VP Operations', dept: 'Corporate Operations', color: '#7c3aed' },
+      { abbr: 'FAC', title: 'VP of Facilities', dept: 'Engineering / Facilities', color: '#d97706' },
+      { abbr: 'ITD', title: 'IT Director', dept: 'Information Technology', color: '#2563eb' },
+      { abbr: 'SEC', title: 'Corporate Security Dir.', dept: 'Security / Asset Protection', color: '#dc2626' },
+    ],
+    plays: [
+      { name: 'Portfolio Standardization', desc: 'Replace fragmented per-property systems — lead with Colonnade BridgePort 170-property case study + OpEx savings' },
+      { name: 'New Property Acquisition', desc: 'Standardize during onboarding of newly acquired or constructed properties — plug-and-play timing advantage' },
+      { name: 'Tenant Safety Initiative', desc: 'Improve security posture to attract premium tenants and reduce liability exposure across portfolio' },
+    ],
+    opp: [
+      'SLC: Growing multifamily market (tech industry expansion driving new construction)',
+      'Chicago: Large commercial RE downtown; significant multifamily expansion in tech corridors',
+      'Self-storage networks are an underserved, high-urgency mid-market segment with fast decisions',
+    ],
+    discovery: [
+      '"Right now, if a tenant at one of your properties reports a security incident at 2am, what\'s the actual process for your team to access that footage — and how long does that take?"',
+      '"How many different security vendors are you managing across your portfolio today? What does the overhead look like in terms of contracts, logins, and support calls per month?"',
+      '"When you acquire a new property, what\'s the typical timeline and cost to bring their security up to your standard — and how consistent is that standard across your portfolio today?"',
+      '"If a tenant needs their access deactivated immediately because they didn\'t renew their lease, how does that happen right now — and who has to make that call at midnight?"',
+      '"In the last 24 months, have you had a security incident at a property where you couldn\'t quickly produce documented footage for your insurance carrier or legal team?"',
+      '"Looking at your capital plan for the next five years, how predictable is your security infrastructure replacement budget — or are you constantly dealing with surprise DVR failures?"',
+    ],
+    compete: [
+      {
+        name: 'Genetec / Milestone',
+        win: 'Self-service wins',
+        bullets: [
+          'Genetec requires a dedicated IT admin at each property — <strong>property managers cannot self-manage access control without IT tickets</strong>',
+          'Per-property server infrastructure makes scaling to 50–200 properties operationally complex and expensive',
+          'Deployment takes months per property with a professional integrator; <strong>Verkada deploys in 1 week, plug-and-play</strong>',
+          'No portfolio-level dashboard — Genetec views are per-site, requiring multiple logins for a multi-property operator',
+        ],
+      },
+      {
+        name: 'Eagle Eye Networks',
+        win: 'Full platform wins',
+        bullets: [
+          'Eagle Eye is camera-only — <strong>no integrated access control, intercom, or visitor management for property ops</strong>',
+          'Property managers still need a separate access control system; no true single-platform vendor consolidation',
+          'Fewer hardware form factors and no 10-year warranty; higher replacement costs across a large portfolio',
+          'Less proven at scale for 100–200 property portfolios; Verkada has documented 170-property deployments',
+        ],
+      },
+      {
+        name: 'Legacy DVR / Per-Property Vendors',
+        win: 'Consolidation wins',
+        bullets: [
+          '<strong>Different vendor at each property = 50+ separate contracts, logins, and support relationships</strong> — operationally unsustainable',
+          'Security incident at one property is invisible to corporate security; no portfolio-wide pattern detection',
+          'Tenant access control changes require calling an integrator — can take days or weeks to execute',
+          'DVR failures at remote properties go undetected for days; no remote health monitoring or alerts',
+        ],
+      },
+    ],
+    products: [
+      { name: 'Video Security', color: '#2563eb', bg: '#dbeafe' },
+      { name: 'Access Control', color: '#16a34a', bg: '#dcfce7' },
+      { name: 'Intercom', color: '#7c3aed', bg: '#ede9fe' },
+      { name: 'Workplace', color: '#d97706', bg: '#fef9c3' },
+    ],
+  },
+  {
+    id: 'plant',
+    name: '"The Plant"',
+    subtitle: 'Manufacturing, Warehousing & Logistics',
+    color: '#b45309',
+    chips: ['1–5 Facilities', '50K–500K+ Sq Ft', 'Cargo Theft Driven'],
+    description: [
+      'Regional manufacturers, warehouses, distribution centers, and 3PL providers with <strong>$30M–$200M revenue</strong> and 1–5 facilities of 50K–500K+ sq ft',
+      'Security is driven by <strong>cargo theft, OSHA compliance, workers\' comp liability, and insurance underwriting requirements</strong> — dollar-denominated P&amp;L risk at every level',
+      '<strong>Harsh environment challenges</strong> (extreme heat, cold, dust, moisture) make legacy DVRs unreliable — they fail exactly when you need them most for an audit or incident',
+      'Winning play: prove prevention ROI on cargo loss + production optimization via heatmaps + show Helix ERP integration and Verkada\'s documented reliability in extreme environments',
+    ],
+    characteristics: [
+      '1–5 large facilities with high-value inventory at risk ($1M–$10M+ per site)',
+      'Harsh environment challenges — extreme temperatures, dust, and moisture kill legacy DVRs',
+      'Insurance underwriters increasingly require documented security systems for full coverage',
+      'Limited IT staff — physical security must be low-maintenance and reliable without dedicated support',
+      'Large security perimeter: parking lots, loading docks, multiple entry points requiring broad coverage',
+      'Law enforcement evidence requests require fast, reliable footage retrieval with a clean chain of custody',
+    ],
+    examples: [
+      'Old Cannery Furniture Warehouse (10 break-in attempts prevented)',
+      'Regional 3PL and logistics providers (2–5 DCs)',
+      'Food & beverage manufacturers (extreme temp environments)',
+      'Automotive parts distributors',
+      'Technology / electronics warehouses (high-value cargo)',
+      'Building materials distributors',
+    ],
+    metrics: [
+      'Cargo/inventory loss: measure shrinkage reduction (e.g., <strong>$3M+ assets protected</strong>)',
+      'Theft incidents detected & prevented — build a documented log for insurance claims',
+      'Investigation time: <strong>&lt;10 min</strong> to retrieve footage for law enforcement',
+      'System uptime: <strong>&gt;99%</strong> in harsh temperature environments',
+      'Insurance claim documentation speed: same-day evidence retrieval',
+      'Installation downtime: <strong>0–1 day</strong> (plug-and-play vs. weeks for legacy)',
+    ],
+    why: [
+      '<strong>Production optimization via heatmaps</strong> — identify bottlenecks, cycle time delays, and "movement waste" on factory floors using occupancy trends; no stopwatch studies or observer headcount required',
+      '<strong>OSHA audit &amp; workers\' comp defense</strong> — continuous 24/7 recording with up to <strong>365-day retention</strong> provides irrefutable video evidence for audits and disputed injury claims',
+      '<strong>Helix ERP/MES integration</strong> — pair video directly with production data to visually audit scrap rate increases or equipment failures the moment anomalies appear in your system',
+      '<strong>Proven in extreme environments</strong> — tested near 1,400°F industrial ovens where legacy DVRs consistently fail; cloud storage survives power outages and facility incidents that wipe local NVRs',
+      '<strong>ALPR for loading docks</strong> — track vehicles across loading zones, flag unauthorized plates, and build a timestamped evidence record for law enforcement or insurance',
+      '<strong>Integrated alarms</strong> — real-time threat response triggered by camera events, not after-the-fact video review; no separate alarm vendor or manual coordination required',
+    ],
+    personas: [
+      { abbr: 'OPS', title: 'Plant / Ops Manager', dept: 'Operations / Facilities', color: '#b45309' },
+      { abbr: 'EHS', title: 'VP of EHS / Safety Officer', dept: 'Environmental Health & Safety', color: '#059669' },
+      { abbr: 'ITD', title: 'IT Director / CIO', dept: 'Information Technology', color: '#2563eb' },
+      { abbr: 'CFO', title: 'CFO / Finance Dir.', dept: 'Finance / Corporate', color: '#16a34a' },
+    ],
+    plays: [
+      { name: 'Theft Prevention ROI', desc: 'Quantify cargo loss exposure and show prevention payback — lead with Old Cannery case study + insurance mandate angle' },
+      { name: 'Insurance Compliance', desc: 'Partner with underwriter requirement — insurance mandate creates non-discretionary urgency and capital justification' },
+      { name: 'Facility Expansion', desc: 'New warehouse or distribution center requires integrated security infrastructure from day one' },
+    ],
+    opp: [
+      'SLC: Technology manufacturing; outdoor equipment production; food/beverage processing facilities',
+      'Chicago: Industrial logistics hubs (major US trucking corridor); automotive supply chain; food distribution',
+      'Insurance-mandated security upgrades are creating non-discretionary buying events — partner with brokers',
+    ],
+    discovery: [
+      '"In the last 12 months, what\'s the dollar value of inventory loss you can directly attribute to theft — and how much more do you suspect went undetected before the next inventory audit?"',
+      '"If cargo went missing from a loading dock overnight, what\'s your investigation process — and how quickly can you produce footage for law enforcement or an insurance claim?"',
+      '"Have your cameras or DVR systems ever failed because of temperature, power issues, or equipment damage on your floor? When that gap happened, what did it cost you?"',
+      '"Does your alarm system currently communicate with your cameras, or are they completely separate — meaning your team has to manually connect the dots during an active incident?"',
+      '"What is your insurance underwriter currently saying about your security documentation requirements? Are there gaps in coverage they\'ve flagged that you\'re trying to close?"',
+      '"If someone was stealing from a loading dock over a two-week period, would your current system surface a pattern — or would each incident look like an isolated one-time event?"',
+    ],
+    compete: [
+      {
+        name: 'Genetec / Milestone',
+        win: 'Reliability wins',
+        bullets: [
+          'Genetec requires IT-managed on-premise servers — <strong>most manufacturers have minimal IT staff for physical security</strong>',
+          'On-premise NVR infrastructure is vulnerable to factory floor conditions: temperature spikes, power fluctuations, dust damage',
+          'No integrated alarms — separate alarm system doesn\'t communicate with Genetec video, slowing response by minutes',
+          'Complex VMS deployment requires integrator weeks on-site; <strong>Verkada installs in a day with no infrastructure build-out</strong>',
+        ],
+      },
+      {
+        name: 'Avigilon (Motorola)',
+        win: 'Harsh-environment wins',
+        bullets: [
+          'Avigilon AI analytics require on-premise GPU servers — <strong>high upfront cost + IT maintenance in a factory environment</strong>',
+          'No unified platform — cameras + access control + alarms require separate configuration and different interfaces',
+          'Avigilon hardware not rated for all harsh factory floor conditions (extreme heat/cold); Verkada tested near 1,400°F ovens',
+          'No ALPR built-in for loading dock vehicle tracking; requires additional hardware and integration',
+        ],
+      },
+      {
+        name: 'Legacy DVR / On-Premise SQ',
+        win: 'Prevention wins',
+        bullets: [
+          '<strong>DVRs fail in extreme temperature environments</strong> — footage loss discovered only during a theft investigation when it\'s too late',
+          'No remote monitoring — security team must be physically present to review footage; after-hours incidents go undetected',
+          'No ALPR or perimeter detection — loading dock theft goes undetected until the next inventory audit',
+          '<strong>Insurance documentation requires manual footage retrieval</strong>; Verkada\'s cloud enables same-day evidence delivery to law enforcement',
+        ],
+      },
+    ],
+    products: [
+      { name: 'Video Security', color: '#2563eb', bg: '#dbeafe' },
+      { name: 'Access Control', color: '#16a34a', bg: '#dcfce7' },
+      { name: 'Alarms', color: '#dc2626', bg: '#fee2e2' },
+      { name: 'Helix', color: '#b45309', bg: '#fef3c7' },
+    ],
+  },
+  {
+    id: 'bank',
+    name: '"The Branch Network"',
+    subtitle: 'Regional Banks, Credit Unions & Financial Institutions',
+    color: '#0369a1',
+    chips: ['50–300 Branches', 'PCI DSS / GLBA', 'ATM Fraud-Driven'],
+    description: [
+      'Regional banks and credit unions with 50–300 branches and $500M–$5B in assets — security is simultaneously a <strong>fraud prevention tool and a compliance mandate</strong>',
+      'ATM jackpotting, card skimming, and vault tampering are rising — <strong>POI alerts and split cameras at cash transaction points</strong> are the primary value driver for Security and Fraud teams',
+      '<strong>PCI DSS and GLBA require documented 90-day video retention</strong> for all cash-handling areas — a compliance gap most legacy DVR setups fail silently without anyone knowing until an audit',
+      'Winning play: consolidate fragmented per-branch systems into one platform covering ATM fraud detection, compliance documentation, branch staffing optimization, and access control under a single contract',
+    ],
+    characteristics: [
+      '50–300 branch locations, each with ATMs, teller lines, and a vault — historically on separate per-branch camera and alarm vendors',
+      'PCI DSS and GLBA require 90-day video retention for cash-handling areas with documented audit trails; manual DVR verification creates silent exposure',
+      'ATM jackpotting and card skimming are rising threats — detection at cash transaction points has become a boardroom conversation',
+      'Branch ops teams need occupancy data to right-size teller staffing without manual observation or stopwatch studies',
+      'High branch staff turnover creates constant access control provisioning and deprovisioning demands across the network',
+      'CISO concerned about IoT endpoint security and encrypted data handling across hundreds of branch locations',
+    ],
+    examples: [
+      'Utah community banks (50–150 branch networks)',
+      'Mountain West credit unions (20–80 locations)',
+      'Midwest regional banks (Illinois, Wisconsin, Indiana)',
+      'Savings institutions with heavy ATM infrastructure',
+      'Specialty finance / check-cashing branch networks',
+      'Community Development Financial Institutions (CDFIs)',
+    ],
+    metrics: [
+      'ATM fraud incidents detected and prevented per quarter — build a documented prevention log',
+      'Compliance coverage: <strong>100% of cash-handling areas</strong> with 90-day retention for PCI DSS / GLBA audits',
+      'Investigation time: <strong>&lt;15 min</strong> to retrieve footage for law enforcement or insurance',
+      'Staffing efficiency: occupancy data used to optimize teller coverage at measured peak-hour intervals',
+      'Vendor consolidation: reduce from 3–5 per-branch vendors to <strong>1 platform, 1 contract</strong>',
+      'Annual OpEx reduction from eliminating per-branch DVR maintenance and integrator service contracts',
+    ],
+    why: [
+      '<strong>POI alerts at every ATM and teller line</strong> — flag known fraudsters by face; receive an instant SMS or email the moment they enter any branch in the network, before a transaction is attempted',
+      '<strong>Split cameras for ATM &amp; vault fraud detection</strong> — purpose-built for jackpotting, skimming, and cash tampering; captures the transaction point and the perpetrator simultaneously',
+      '<strong>PCI DSS &amp; GLBA compliance out of the box</strong> — 90-day on-camera retention for cash-handling areas, SOC 2 certified, role-based access, and a full audit trail with zero manual DVR verification',
+      '<strong>Branch staffing optimization</strong> — occupancy analytics across all locations show peak operating hours at each branch; leadership right-sizes teller coverage without manual observation',
+      '<strong>SSO, MFA, and SAML authentication</strong> — satisfies enterprise CISO requirements; end-to-end RSA + AES encryption across every branch endpoint',
+      '<strong>10-year warranty + automatic firmware updates</strong> — no per-branch DVR replacement cycle; one platform, one contract, predictable CapEx across the entire network',
+    ],
+    personas: [
+      { abbr: 'CSO', title: 'Corporate Security Dir.', dept: 'Security & Risk', color: '#dc2626' },
+      { abbr: 'FPL', title: 'Fraud Prevention Lead', dept: 'Loss Prevention / Fraud', color: '#d97706' },
+      { abbr: 'CCO', title: 'Compliance Manager', dept: 'Compliance / Risk', color: '#059669' },
+      { abbr: 'ITD', title: 'IT Director / CIO', dept: 'Information Technology', color: '#2563eb' },
+    ],
+    plays: [
+      { name: 'ATM Fraud Prevention', desc: 'Lead with jackpotting/skimming threat + split camera POI alert capability — Security or Fraud urgency play with law enforcement referral angle' },
+      { name: 'PCI DSS / GLBA Compliance', desc: '90-day on-camera retention + audit-ready access trails eliminates manual DVR verification gap; compliance mandate creates non-discretionary urgency' },
+      { name: 'Branch Network Consolidation', desc: 'Replace fragmented per-branch vendors with one platform — 10-year warranty + OpEx savings is the CFO/COO sign-off play' },
+    ],
+    opp: [
+      'SLC: Utah community banks and Mountain West credit unions — rapidly expanding branch networks with aging per-location DVR infrastructure',
+      'Chicago: Midwest regional banks and credit union networks — large suburban and urban branch footprints with active PCI DSS pressure',
+      'Compliance-mandated security upgrades are creating non-discretionary buying events at smaller institutions with no dedicated physical security IT staff',
+    ],
+    discovery: [
+      '"In the last 12 months, have any of your ATMs or teller areas been targeted by skimming or jackpotting — and when you needed footage for law enforcement, how quickly could you produce it?"',
+      '"How do you currently verify that 100% of your cash-handling areas have continuous video coverage for your PCI DSS audits — and what happens if a branch DVR goes down silently for three days?"',
+      '"If a known fraud suspect walked into one of your branches right now, how would your team know — and what\'s the process to alert the teller or trigger a response before a transaction completes?"',
+      '"How many separate camera or alarm vendors are you managing across your branches today? What does that look like in terms of contracts, support tickets, and IT overhead per month?"',
+      '"Do you have any way right now to use your branch traffic and occupancy data to inform teller staffing decisions — or is scheduling still based on historical patterns and manager intuition?"',
+      '"When a branch employee is terminated, how quickly can you revoke their access across every door at every location — and how confident are you that process is airtight within the hour?"',
+    ],
+    compete: [
+      {
+        name: 'Genetec / Milestone',
+        win: 'Compliance & simplicity win',
+        bullets: [
+          'Genetec Security Center requires a dedicated IT admin per region — most community banks have no physical security IT staff at the branch level',
+          'No built-in occupancy analytics for teller staffing optimization; <strong>Verkada heatmaps and occupancy data are native to the platform at no extra cost</strong>',
+          'Manual configuration required per branch for 90-day retention; <strong>Verkada\'s on-camera PCI retention is automatic and audit-ready out of the box</strong>',
+          'Multi-module licensing (video, access, alarms separate) vs. Verkada\'s unified Command platform — one contract, one support relationship',
+        ],
+      },
+      {
+        name: 'Avigilon (Motorola)',
+        win: 'Cloud investigation wins',
+        bullets: [
+          'Avigilon requires on-premise NVR servers at each branch — <strong>high upfront cost and complex IT maintenance across 50–300 locations</strong>',
+          'No unified branch-level investigation dashboard; fraud team must access each location\'s NVR separately for cross-branch cases',
+          'No occupancy analytics or staffing optimization tools — branch ops cannot use Avigilon for any efficiency decisions beyond security',
+          'Motorola\'s focus is public safety, not community banking workflows, PCI DSS compliance, or financial institution requirements',
+        ],
+      },
+      {
+        name: 'Legacy DVR / Per-Branch Vendors',
+        win: 'Compliance & visibility win',
+        bullets: [
+          '<strong>DVR failures at ATM locations go undetected</strong> — coverage gaps discovered only when footage is needed for a fraud investigation or PCI audit, too late to recover',
+          'PCI DSS compliance requires manual verification that each branch DVR is recording; no central health monitoring, no automated alerts',
+          'Cross-branch fraud investigation requires calling branch managers to pull local footage — hours of delay on a time-sensitive case',
+          'No POI alerting, no occupancy analytics, no mobile access — fraud response is always reactive, discovered after the loss, not before',
+        ],
+      },
+    ],
+    products: [
+      { name: 'Video Security', color: '#2563eb', bg: '#dbeafe' },
+      { name: 'Access Control', color: '#16a34a', bg: '#dcfce7' },
+      { name: 'Alarms', color: '#dc2626', bg: '#fee2e2' },
+      { name: 'Visitor Mgmt', color: '#0891b2', bg: '#cffafe' },
+    ],
+  },
+  {
+    id: 'sled',
+    name: '"The Precinct"',
+    subtitle: 'Municipal Police, Sheriff Departments & SLED Agencies',
+    color: '#1e3a5f',
+    chips: ['SLED Vertical', 'Axon-Integrated', 'RTCCs & Smart Policing'],
+    description: [
+      'Municipal police departments, sheriff offices, and campus police managing <strong>Real-Time Crime Centers (RTCCs) and public safety camera infrastructure</strong>',
+      'Technology decisions are driven by <strong>crime resolution speed, officer efficiency, and real-time situational awareness</strong> — not just after-the-fact evidence collection',
+      '<strong>Axon is the decisive wedge</strong>: Verkada\'s native integration with Axon Fusus and Evidence.com unifies city camera feeds into the command center without manual coordination or file exports',
+      'Winning play: replace disconnected city cameras with a platform that streams live into the RTCC, integrates natively with Axon, and delivers AI-powered ALPR with full video context across jurisdictions',
+    ],
+    characteristics: [
+      'RTCCs require unified feeds from disparate city, private, and agency cameras — currently managed via separate logins or manual phone coordination',
+      'Axon Evidence.com is the dominant case management platform in law enforcement — Verkada\'s native integration is a direct workflow accelerator for any Axon agency',
+      'Investigators manually scrub through hours of disconnected footage across multiple city camera systems to reconstruct incident timelines',
+      'ALPR deployments often limited to still-image capture; investigators lack full video context for cross-jurisdiction vehicle tracking',
+      'Municipal IT and capital budgets are constrained; purchases require grant funding (COPS, JAG), council approval, or bond allocations',
+      'Multi-agency coordination (city PD, county sheriff, state agencies) requires shared video access without compromising chain of custody',
+    ],
+    examples: [
+      'Municipal police departments (mid-size cities, 50K–500K population)',
+      'County sheriff departments with RTCC operations',
+      'University campus police (Title IV-funded — SLED sub-vertical)',
+      'Transit authority police (UTA, Metra, CTA)',
+      'SLC metro and Wasatch Front departments',
+      'Chicago suburban departments (Cook, DuPage, Will counties)',
+    ],
+    metrics: [
+      'Case closure rate improvement after Axon Evidence.com live video integration',
+      'Footage retrieval time: <strong>&lt;10 min</strong> per incident (vs. hours with disconnected systems)',
+      'ALPR hits per month — known vehicles flagged with full video context before officer encounter',
+      'RTCC feeds unified: # of previously disconnected sources consolidated into one view',
+      'Investigator hours saved per month on manual footage scrubbing across disconnected systems',
+      'Live video links dispatched to responding units per month',
+    ],
+    why: [
+      '<strong>Axon Fusus &amp; Evidence.com integration</strong> — stream live Verkada camera feeds directly into the RTCC command center; responding officers see real-time video before they arrive on scene',
+      '<strong>AI-powered ALPR with full video context</strong> — unlike point ALPR solutions that return a still image, Verkada records full video of the vehicle and occupants; investigators get the scene, not just the plate',
+      '<strong>Share live links instantly with first responders</strong> — one click generates a shareable live feed URL; dispatch can push video to responding units without requiring a system login',
+      '<strong>AI forensic search across all camera feeds</strong> — investigators search by clothing description, vehicle color, or face match across the entire network in seconds, not hours of manual scrubbing',
+      '<strong>Multi-agency access with role-based permissions</strong> — city PD, county sheriff, and state agencies share access to specific feeds without compromising chain of custody or evidence integrity',
+      '<strong>No local servers at camera sites</strong> — hybrid cloud eliminates the NVR maintenance burden on city IT; automatic firmware updates, no site visits required for software patches',
+    ],
+    personas: [
+      { abbr: 'COP', title: 'Chief of Police / Sheriff', dept: 'Law Enforcement Leadership', color: '#1e3a5f' },
+      { abbr: 'RTCC', title: 'Lt. of RTCC / Ops Ctr', dept: 'Real-Time Crime Center', color: '#dc2626' },
+      { abbr: 'INV', title: 'Detective / Investigator', dept: 'Investigations Unit', color: '#d97706' },
+      { abbr: 'ITD', title: 'IT Director / Sys. Admin', dept: 'Municipal IT', color: '#2563eb' },
+    ],
+    plays: [
+      { name: 'Axon Integration Wedge', desc: 'Any agency using Axon Evidence.com is a high-priority target — native integration means live video flows directly into case management; strongest close in the SLED vertical' },
+      { name: 'RTCC Unification', desc: 'Replace disconnected city, private, and agency feeds with one unified dashboard — RTCC commanders see everything from one screen with one login, no manual coordination' },
+      { name: 'ALPR Upgrade', desc: 'Replace still-image ALPR with full video context LPR — investigators get the scene, the vehicle, and the occupants instead of a plate number and a timestamp' },
+    ],
+    opp: [
+      'SLC: Salt Lake City PD, Utah County Sheriff, UTA transit police — Axon is dominant in Utah law enforcement, making the integration wedge immediately actionable on first call',
+      'Chicago: Suburban Cook, DuPage, and Will county departments — high crime pressure driving RTCC investment; Axon widely deployed across the corridor',
+      'University campus police in both territories (SLED sub-vertical) — Title IV funding cycles, active shooter response requirements, Clery Act reporting obligations',
+    ],
+    discovery: [
+      '"Right now, if a pursuit or active incident unfolds near a city camera, how does your RTCC or dispatch get eyes on that feed — and how many systems do they have to log into to make that happen?"',
+      '"When an investigator needs footage from three different camera operators or businesses to reconstruct a crime timeline, what does that coordination process look like — and how many hours does it typically take?"',
+      '"How many cases in the last quarter involved footage that was unavailable, unusable, or took more than 24 hours to retrieve? What\'s the direct clearance impact of those delays?"',
+      '"Your investigators likely use Axon Evidence.com for case management — if your camera footage could stream directly into that workflow without exporting files, how would that change your clearance rate or time-to-charge?"',
+      '"When you run ALPR on a suspect vehicle today, are you getting still images or full video of the vehicle and occupants — and has a case ever hinged on something a still image couldn\'t show you?"',
+      '"If you needed to share a live camera feed with a responding unit right now, what\'s the actual process — and has that delay ever cost you situational awareness during an active incident?"',
+    ],
+    compete: [
+      {
+        name: 'Axon Fusus (point solution)',
+        win: 'Full platform wins',
+        bullets: [
+          '<strong>Fusus aggregates existing feeds but doesn\'t replace aging infrastructure</strong> — Verkada replaces fragmented city cameras AND integrates with Fusus simultaneously, giving agencies a hardware upgrade and the RTCC integration in one purchase',
+          'Fusus is a video aggregation layer only — no integrated access control, alarms, or intercom for precinct and facility security',
+          'Agencies already using Axon Evidence.com get <strong>Verkada\'s native case management integration</strong> without replacing their Axon investment — additive, not competitive',
+          'Verkada AI forensic search and full-context ALPR are native capabilities; Fusus relies entirely on the quality of the feeds it aggregates',
+        ],
+      },
+      {
+        name: 'Genetec / Milestone',
+        win: 'Speed & simplicity win',
+        bullets: [
+          'Genetec Security Center requires dedicated IT staff to maintain on-premise VMS infrastructure — most municipal IT departments are understaffed for complex physical security administration',
+          'No native Axon Fusus or Evidence.com integration — case footage must be manually exported and uploaded, adding hours to every investigation workflow',
+          '<strong>AI forensic search requires trained VMS operators</strong>; Verkada\'s person and vehicle search is built for investigators without technical training',
+          'Multi-site deployment requires professional integrators and weeks of configuration; Verkada installs plug-and-play with no infrastructure build-out at each camera location',
+        ],
+      },
+      {
+        name: 'Legacy / Disconnected City Cameras',
+        win: 'Unified visibility wins',
+        bullets: [
+          '<strong>Each site on a separate DVR</strong> — reconstructing a crime timeline requires physically visiting locations or coordinating with separate operators; hours of investigative delay on time-sensitive cases',
+          'No RTCC integration — dispatch and commanders cannot pull city camera feeds without calling an operator or logging into each individual system separately',
+          'ALPR limited to still images only; no video context for suspect vehicle tracking; responding officers encounter vehicles with no visual intelligence',
+          '<strong>DVR failures at camera sites go undetected for days</strong>; coverage gaps discovered only when critical footage is needed for an active investigation',
+        ],
+      },
+    ],
+    products: [
+      { name: 'Video Security', color: '#2563eb', bg: '#dbeafe' },
+      { name: 'Access Control', color: '#16a34a', bg: '#dcfce7' },
+      { name: 'Alarms', color: '#dc2626', bg: '#fee2e2' },
+    ],
+  },
+];
+
+// ── Render ──────────────────────────────────────────────
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderNav() {
+  const nav = document.getElementById('icp-nav');
+  nav.innerHTML = ICPs.map((icp, i) =>
+    `<button class="icp-tab${i===0?' active':''}" style="--tc:${icp.color}" onclick="showICP(${i})">${icp.name}</button>`
+  ).join('');
+}
+
+function renderPanels() {
+  const container = document.getElementById('icp-panels');
+  container.innerHTML = ICPs.map((icp, i) => `
+    <div class="icp-panel${i===0?' active':''}" id="panel-${i}">
+
+      <!-- Header -->
+      <div class="icp-header" style="background:${icp.color};">
+        <div class="icp-header-eyebrow">ICP ${i+1} of ${ICPs.length} · Mid-Market · Verkada</div>
+        <div class="icp-header-name">${icp.name}</div>
+        <div class="icp-header-sub">${icp.subtitle}</div>
+        <div class="icp-header-meta">
+          ${icp.chips.map(c=>`<span class="icp-meta-chip">${c}</span>`).join('')}
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="icp-grid">
+
+        <!-- Description -->
+        <div class="card c-desc">
+          <div class="ch hd-teal">
+            <span class="ch-icon">📋</span>
+            <div><div class="ch-title">Description</div></div>
+          </div>
+          <div class="cb">
+            <ul class="blist">
+              ${icp.description.map(d=>`<li>${d}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Characteristics -->
+        <div class="card c-char">
+          <div class="ch hd-teal2">
+            <span class="ch-icon">🏢</span>
+            <div><div class="ch-title">Common Characteristics</div></div>
+          </div>
+          <div class="cb">
+            <ul class="blist">
+              ${icp.characteristics.map(c=>`<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Example Companies -->
+        <div class="card c-examples">
+          <div class="ch hd-slate">
+            <span class="ch-icon">🏷️</span>
+            <div><div class="ch-title">Example Companies</div></div>
+          </div>
+          <div class="cb">
+            <div class="ex-grid">
+              ${icp.examples.map(e=>`<span class="ex-pill">${e}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Metrics -->
+        <div class="card c-metrics">
+          <div class="ch hd-blue">
+            <span class="ch-icon">📊</span>
+            <div><div class="ch-title">Success Metrics</div><div class="ch-sub">What this ICP measures to justify the buy</div></div>
+          </div>
+          <div class="cb">
+            <ul class="blist">
+              ${icp.metrics.map(m=>`<li>${m}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Key Discovery Questions -->
+        <div class="card c-discovery">
+          <div class="ch hd-cyan">
+            <span class="ch-icon">🔍</span>
+            <div><div class="ch-title">Key Discovery Questions</div><div class="ch-sub">Ask these in your first qualifying meeting</div></div>
+          </div>
+          <div class="cb">
+            <div class="q-list">
+              ${icp.discovery.map(q=>`<div class="q-item">${q}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Why Verkada -->
+        <div class="card c-why" style="align-self:stretch;">
+          <div class="ch hd-indigo">
+            <span class="ch-icon">⚡</span>
+            <div><div class="ch-title">Why They Need Verkada</div></div>
+          </div>
+          <div class="cb">
+            <ul class="blist">
+              ${icp.why.map(w=>`<li>${w}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Key Personas -->
+        <div class="card c-personas">
+          <div class="ch hd-purple">
+            <span class="ch-icon">👤</span>
+            <div><div class="ch-title">Key Personas</div><div class="ch-sub">Who you're selling to — and who's in the room</div></div>
+          </div>
+          <div class="cb">
+            <div class="personas-row">
+              ${icp.personas.map((p,pi)=>`
+                <div class="persona-card">
+                  <div class="p-avatar" style="background:${p.color};">${p.abbr}</div>
+                  <div class="p-num">${pi+1}.</div>
+                  <div class="p-title">${p.title}</div>
+                  <div class="p-dept">${p.dept}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Plays -->
+        <div class="card c-plays">
+          <div class="ch hd-gray">
+            <span class="ch-icon">▶</span>
+            <div><div class="ch-title">Customer Plays</div></div>
+          </div>
+          <div class="cb">
+            <div class="play-list">
+              ${icp.plays.map((pl,pi)=>`
+                <div class="play-item">
+                  <span class="play-name">${pi+1}. ${pl.name}</span>
+                  ${pl.desc}
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Opportunity -->
+        <div class="card c-opp">
+          <div class="ch hd-dark">
+            <span class="ch-icon">💡</span>
+            <div><div class="ch-title">Opportunity</div><div class="ch-sub">SLC &amp; Chicago Territory</div></div>
+          </div>
+          <div class="cb">
+            <div class="opp-list">
+              ${icp.opp.map(o=>`<div class="opp-item">${o}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Displace the Competition -->
+        <div class="card c-battle">
+          <div class="ch hd-black">
+            <span class="ch-icon">⚔️</span>
+            <div><div class="ch-title">How to Displace the Competition</div><div class="ch-sub">Your edge when Genetec, Avigilon, or the status quo is in the room</div></div>
+          </div>
+          <div class="cb">
+            <div class="compete-grid">
+              ${icp.compete.map(c => `
+                <div>
+                  <div class="compete-col-header">
+                    <span class="compete-vs">vs.</span>
+                    <span class="compete-name">${c.name}</span>
+                    <span class="compete-win">${c.win}</span>
+                  </div>
+                  <div class="compete-list">
+                    ${c.bullets.map(b => `<div class="compete-item">${b}</div>`).join('')}
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Lines -->
+        <div class="c-products products-bar">
+          <span class="prod-label">Relevant Products</span>
+          ${icp.products.map(p=>`<span class="prod-chip" style="background:${p.bg};color:${p.color};">${p.name}</span>`).join('')}
+          <span class="prod-note">All products managed via Verkada Command platform</span>
+        </div>
+
+      </div>
+    </div>
+  `).join('');
+}
+
+function showICP(idx) {
+  document.querySelectorAll('.icp-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.icp-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+}
+
+renderNav();
+renderPanels();
+</script>
+</body>
+</html>

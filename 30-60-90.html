@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VerkadaWin — Jason Brown 30/60/90</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #0f0f0f;
+      color: #fff;
+      padding: 48px 40px 36px;
+    }
+    .header-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 10px;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .header-sub {
+      font-size: 15px;
+      color: #aaa;
+      margin-bottom: 24px;
+    }
+    .header-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .meta-chip {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: #ccc;
+    }
+    .meta-chip strong { color: #fff; }
+
+    /* ── Principle bar ── */
+    .principle {
+      background: #1a3a5c;
+      color: #e8f0fe;
+      padding: 14px 40px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      border-left: 4px solid #4a90d9;
+    }
+
+    /* ── Main layout ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Phase columns ── */
+    .phases {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 860px) {
+      .phases { grid-template-columns: 1fr; }
+    }
+
+    .phase {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .phase-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .phase-number {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .phase h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+    .phase-tagline {
+      font-size: 12px;
+      color: #888;
+      font-weight: 500;
+    }
+    .phase-mandate {
+      font-size: 13px;
+      color: #444;
+      padding: 14px 24px;
+      background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+      font-style: italic;
+    }
+
+    /* Phase color accents */
+    .phase-1 .phase-header { border-top: 4px solid #3b82f6; }
+    .phase-1 .phase-number { color: #3b82f6; }
+    .phase-2 .phase-header { border-top: 4px solid #f59e0b; }
+    .phase-2 .phase-number { color: #f59e0b; }
+    .phase-3 .phase-header { border-top: 4px solid #10b981; }
+    .phase-3 .phase-number { color: #10b981; }
+
+    /* ── Focus areas ── */
+    .focus-list {
+      padding: 16px 24px 20px;
+    }
+    .focus-item {
+      margin-bottom: 18px;
+    }
+    .focus-item:last-child { margin-bottom: 0; }
+    .focus-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 5px;
+    }
+    .focus-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    .focus-actions {
+      list-style: none;
+      padding: 0;
+    }
+    .focus-actions li {
+      font-size: 13px;
+      color: #555;
+      padding: 2px 0 2px 14px;
+      position: relative;
+    }
+    .focus-actions li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #bbb;
+      font-size: 11px;
+      top: 3px;
+    }
+
+    /* ── Deliverables ── */
+    .deliverables-section {
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .deliverables-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #bbb;
+      margin-bottom: 8px;
+      padding: 0 24px;
+    }
+    .deliverables-list {
+      padding: 0 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .deliverable {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: #444;
+    }
+    .deliverable-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .phase-1 .deliverable-dot { background: #3b82f6; }
+    .phase-2 .deliverable-dot { background: #f59e0b; }
+    .phase-3 .deliverable-dot { background: #10b981; }
+
+    /* ── Anchor themes ── */
+    .anchors {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .anchors h3 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 16px;
+    }
+    .anchor-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 700px) {
+      .anchor-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .anchor-card {
+      background: #f8f8f8;
+      border-radius: 8px;
+      padding: 14px 16px;
+      border: 1px solid #efefef;
+    }
+    .anchor-card .icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .anchor-card .title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    .anchor-card .desc {
+      font-size: 11px;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    /* ── Markets callout ── */
+    .markets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 600px) {
+      .markets { grid-template-columns: 1fr; }
+    }
+    .market-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      padding: 22px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .market-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .market-badge {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #f0f0f0;
+      color: #666;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .market-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .market-card ul li {
+      font-size: 12px;
+      color: #555;
+      padding: 3px 0;
+      padding-left: 14px;
+      position: relative;
+    }
+    .market-card ul li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #ccc;
+    }
+
+    /* ── Success metrics ── */
+    .metrics {
+      background: #0f0f0f;
+      border-radius: 12px;
+      padding: 28px 32px;
+      color: #fff;
+    }
+    .metrics h3 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 700px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+    .metric-item { }
+    .metric-phase {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+    .metric-phase.p1 { color: #3b82f6; }
+    .metric-phase.p2 { color: #f59e0b; }
+    .metric-phase.p3 { color: #10b981; }
+    .metric-item ul {
+      list-style: none;
+      padding: 0;
+    }
+    .metric-item ul li {
+      font-size: 13px;
+      color: #ccc;
+      padding: 3px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+    .metric-item ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #444;
+      font-size: 11px;
+    }
+
+    section-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #aaa;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-eyebrow">VerkadaWin</div>
+    <h1>Jason Brown — 30/60/90 Day Plan</h1>
+    <div class="header-sub">VP of Sales, Salt Lake City + Chicago</div>
+    <div class="header-meta">
+      <div class="meta-chip"><strong>Company:</strong> Verkada</div>
+      <div class="meta-chip"><strong>Role:</strong> VP of Sales</div>
+      <div class="meta-chip"><strong>Markets:</strong> Salt Lake City + Chicago</div>
+      <div class="meta-chip"><strong>Start Date:</strong> TBD</div>
+      <div class="meta-chip"><strong>Framework:</strong> COS v4.0</div>
+    </div>
+  </div>
+
+  <div class="principle">
+    Core operating belief: Revenue is designed, not owned. Heroics don't scale. Architecture does. The first 90 days build the foundation everything else runs on.
+  </div>
+
+  <div class="container">
+
+    <!-- Anchor Themes -->
+    <div class="anchors">
+      <h3>Four Anchors for the First 90 Days</h3>
+      <div class="anchor-grid">
+        <div class="anchor-card">
+          <div class="icon">👂</div>
+          <div class="title">Listen First</div>
+          <div class="desc">Diagnose before prescribing. Earn the right to lead by understanding the current reality.</div>
+        </div>
+        <div class="anchor-card">
+          <div class="icon">🤝</div>
+          <div class="title">Build Trust Fast</div>
+          <div class="desc">Relationships with reps, peers, and leadership determine how fast you can move when it's time to move.</div>
+        </div>
+        <div class="anchor-card">
+          <div class="icon">🔍</div>
+          <div class="title">Find the Bottleneck</div>
+          <div class="desc">One constraint is limiting revenue right now. Find it. Don't try to fix everything at once.</div>
+        </div>
+        <div class="anchor-card">
+          <div class="icon">⚙️</div>
+          <div class="title">Install the System</div>
+          <div class="desc">The MOR, Weekly Tacticals, and QCRs are the operating rhythm. Get them in place by day 90.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase Cards -->
+    <div class="phases">
+
+      <!-- Day 1-30 -->
+      <div class="phase phase-1">
+        <div class="phase-header">
+          <div class="phase-number">Days 1 – 30</div>
+          <h2>Listen and Learn</h2>
+          <div class="phase-tagline">Understand the current reality before touching anything.</div>
+        </div>
+        <div class="phase-mandate">
+          "You cannot fix what you don't understand. Spend this month becoming the most informed person in the room about your two markets."
+        </div>
+        <div class="focus-list">
+
+          <div class="focus-item">
+            <div class="focus-label">People</div>
+            <div class="focus-title">1:1s with every rep</div>
+            <ul class="focus-actions">
+              <li>Learn their story, their goals, their frustrations</li>
+              <li>Understand their current pipeline and biggest deals</li>
+              <li>Ask: what's broken, what's working, what do they need</li>
+              <li>Don't make promises. Take notes.</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Cross-Functional</div>
+            <div class="focus-title">Meet every partner you'll depend on</div>
+            <ul class="focus-actions">
+              <li>SE team, CS, marketing, RevOps, recruiting</li>
+              <li>Understand the handoff model and where it breaks</li>
+              <li>Learn the tools: CRM hygiene, pipeline reviews, reporting</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Market</div>
+            <div class="focus-title">Understand both territories cold</div>
+            <ul class="focus-actions">
+              <li>SLC vs. Chicago: market size, existing coverage, whitespace</li>
+              <li>Top accounts in each market, deal history, open opps</li>
+              <li>Competitive dynamics in each geography</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Verkada</div>
+            <div class="focus-title">Master the product and the company</div>
+            <ul class="focus-actions">
+              <li>Full product certification, not just familiarity</li>
+              <li>Learn the ICP: who wins, who doesn't, and why</li>
+              <li>Shadow 5+ customer calls across both markets</li>
+              <li>Read the last 2 quarters of deal reviews and closed-lost data</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="deliverables-section">
+          <div class="deliverables-label">Day 30 Deliverables</div>
+          <div class="deliverables-list">
+            <div class="deliverable"><span class="deliverable-dot"></span>Current-state map: people, pipeline, and performance by market</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>Initial hypothesis on the core bottleneck in each territory</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>Relationship map: advocates, neutrals, and skeptics</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>First leadership sync: observations and open questions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 31-60 -->
+      <div class="phase phase-2">
+        <div class="phase-header">
+          <div class="phase-number">Days 31 – 60</div>
+          <h2>Diagnose and Design</h2>
+          <div class="phase-tagline">Turn your observations into a clear point of view.</div>
+        </div>
+        <div class="phase-mandate">
+          "The bottleneck is usually not what people think it is. Pressure-test your Day 30 hypothesis before committing to a design."
+        </div>
+        <div class="focus-list">
+
+          <div class="focus-item">
+            <div class="focus-label">Pipeline</div>
+            <div class="focus-title">Do a full pipeline scrub</div>
+            <ul class="focus-actions">
+              <li>Grade every rep's pipeline: real vs. happy ears</li>
+              <li>Identify the 10 deals most worth your time to accelerate</li>
+              <li>Find the conversion breaks: where does pipeline die?</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Team Design</div>
+            <div class="focus-title">Quadrant every rep</div>
+            <ul class="focus-actions">
+              <li>Map each person: performance vs. culture fit</li>
+              <li>Identify A-players to invest in and protect</li>
+              <li>Identify where coaching is the answer vs. where it isn't</li>
+              <li>Start building the team you want, not just managing the one you have</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Operating Model</div>
+            <div class="focus-title">Design your MOR and Weekly Tacticals</div>
+            <ul class="focus-actions">
+              <li>Draft the weekly cadence for both markets</li>
+              <li>Define what a good pipeline review looks like</li>
+              <li>Set the scoreboard: which metrics matter, which are noise</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Accounts</div>
+            <div class="focus-title">Get into the field on key deals</div>
+            <ul class="focus-actions">
+              <li>Join the top 3-5 deals in each market</li>
+              <li>Meet the economic buyers, not just the champions</li>
+              <li>Start building your own executive relationships</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="deliverables-section">
+          <div class="deliverables-label">Day 60 Deliverables</div>
+          <div class="deliverables-list">
+            <div class="deliverable"><span class="deliverable-dot"></span>Team Quadrant map with development plans for each rep</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>Pipeline health report: quality, coverage, and gaps by market</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>Draft MOR and Weekly Tactical cadence for both territories</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>Diagnosis readout to leadership: bottleneck, root cause, and plan</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 61-90 -->
+      <div class="phase phase-3">
+        <div class="phase-header">
+          <div class="phase-number">Days 61 – 90</div>
+          <h2>Build and Execute</h2>
+          <div class="phase-tagline">Install the system. Start compounding results.</div>
+        </div>
+        <div class="phase-mandate">
+          "By Day 90, the team should feel a new operating standard. Not a speech about standards. An actual one, running every week."
+        </div>
+        <div class="focus-list">
+
+          <div class="focus-item">
+            <div class="focus-label">Operating Rhythm</div>
+            <div class="focus-title">Launch the MOR in both markets</div>
+            <ul class="focus-actions">
+              <li>Weekly Tacticals running clean: pipeline, activity, next steps</li>
+              <li>1:1s structured and consistent, not ad hoc</li>
+              <li>QCR template drafted and scheduled for end of quarter</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Coaching</div>
+            <div class="focus-title">Start the coaching loop</div>
+            <ul class="focus-actions">
+              <li>At least 2 call reviews per rep per month</li>
+              <li>Feedback is specific, behavioral, and fast</li>
+              <li>A-players get stretch assignments. Laggards get clarity.</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Pipeline</div>
+            <div class="focus-title">Build a real coverage model</div>
+            <ul class="focus-actions">
+              <li>3x pipeline coverage minimum in both markets</li>
+              <li>Prospecting motion is consistent, not rep-dependent</li>
+              <li>Top accounts have multi-threaded coverage</li>
+            </ul>
+          </div>
+
+          <div class="focus-item">
+            <div class="focus-label">Culture</div>
+            <div class="focus-title">Set the standard by living it</div>
+            <ul class="focus-actions">
+              <li>The team knows what you expect. No ambiguity.</li>
+              <li>Triple-win is the lens: rep wins, business wins, customer wins</li>
+              <li>Accountability is consistent. Recognition is loud.</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="deliverables-section">
+          <div class="deliverables-label">Day 90 Deliverables</div>
+          <div class="deliverables-list">
+            <div class="deliverable"><span class="deliverable-dot"></span>Full operating system running: MOR, Weekly Tacticals, 1:1s, QCRs</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>90-day readout to leadership: wins, gaps, and Q2/Q3 focus</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>Hiring plan if headcount gaps exist in either market</div>
+            <div class="deliverable"><span class="deliverable-dot"></span>Top 20 target accounts named and actively covered in both markets</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Market-Specific Notes -->
+    <section-label>Market-Specific Priorities</section-label>
+    <div class="markets">
+      <div class="market-card">
+        <h3>Salt Lake City <span class="market-badge">Market 1</span></h3>
+        <ul>
+          <li>Understand current team size, tenure, and performance history</li>
+          <li>Map the local enterprise landscape: tech, healthcare, logistics, education</li>
+          <li>Identify whether SLC is under-covered, correctly covered, or over-indexed</li>
+          <li>Find the 2-3 lighthouse accounts worth executive attention in Q1</li>
+          <li>Assess SE and CS support alignment in the market</li>
+        </ul>
+      </div>
+      <div class="market-card">
+        <h3>Chicago <span class="market-badge">Market 2</span></h3>
+        <ul>
+          <li>Larger, more competitive enterprise market, likely more complex team</li>
+          <li>Map key verticals: financial services, manufacturing, retail, healthcare, education</li>
+          <li>Understand the current competitive pressure from legacy players</li>
+          <li>Identify top 3 accounts where Verkada has a real right to win now</li>
+          <li>Assess whether the Chicago team needs rebuilding or accelerating</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Success Metrics -->
+    <div class="metrics">
+      <h3>How You'll Know It's Working</h3>
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <div class="metric-phase p1">By Day 30</div>
+          <ul>
+            <li>Every rep has had a real 1:1</li>
+            <li>You can name every open deal in both markets</li>
+            <li>Leadership trusts you are listening, not imposing</li>
+            <li>You have a working hypothesis on the bottleneck</li>
+          </ul>
+        </div>
+        <div class="metric-item">
+          <div class="metric-phase p2">By Day 60</div>
+          <ul>
+            <li>Team Quadrant is mapped</li>
+            <li>Pipeline quality has improved (scrubbed, graded)</li>
+            <li>Diagnosis is on paper and socialized with leadership</li>
+            <li>Operating cadence is drafted and previewed with the team</li>
+          </ul>
+        </div>
+        <div class="metric-item">
+          <div class="metric-phase p3">By Day 90</div>
+          <ul>
+            <li>MOR, Weekly Tacticals, and 1:1s are running consistently</li>
+            <li>Reps know what great looks like — and are being held to it</li>
+            <li>Pipeline coverage is 3x+ in both markets</li>
+            <li>You have a clear Q2/Q3 plan and leadership alignment</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>People Intel — VerkadaWin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+      --border: #e8e8e8;
+      --text: #1a1a1a;
+      --muted: #888;
+      --subtle: #f0f0f0;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --amber: #d97706;
+      --amber-light: #fffbeb;
+      --red: #dc2626;
+      --red-light: #fef2f2;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: #0f0f0f;
+      color: #fff;
+      padding: 0 20px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-title { font-size: 14px; font-weight: 600; }
+    .topbar-sub { font-size: 12px; color: #666; }
+    .btn-add-person {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-add-person:hover { background: #1d4ed8; }
+    .btn-topbar {
+      background: none;
+      color: #aaa;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-topbar:hover { color: #fff; border-color: #666; }
+
+    /* ── Main layout ── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sidebar-search {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-search input {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      background: var(--subtle);
+      outline: none;
+    }
+    .sidebar-search input:focus { border-color: var(--accent); background: #fff; }
+    .person-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px;
+    }
+    .person-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2px;
+    }
+    .person-item:hover { background: var(--subtle); }
+    .person-item.active { background: var(--accent-light); }
+    .person-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .person-info { flex: 1; min-width: 0; }
+    .person-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .person-meta { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .quadrant-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .q1 { background: var(--green); }
+    .q2 { background: var(--accent); }
+    .q3 { background: var(--amber); }
+    .q4 { background: var(--red); }
+    .sidebar-empty {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* ── Main panel ── */
+    .main {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Empty state */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      gap: 10px;
+    }
+    .empty-state .icon { font-size: 40px; }
+    .empty-state p { font-size: 14px; }
+
+    /* Person panel */
+    .person-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Person header */
+    .person-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .person-header-left { display: flex; align-items: center; gap: 14px; }
+    .person-header-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .person-header-name { font-size: 18px; font-weight: 700; }
+    .person-header-meta { font-size: 13px; color: var(--muted); margin-top: 2px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .quadrant-badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .qb-1 { background: var(--green-light); color: var(--green); }
+    .qb-2 { background: var(--accent-light); color: var(--accent); }
+    .qb-3 { background: var(--amber-light); color: var(--amber); }
+    .qb-4 { background: var(--red-light); color: var(--red); }
+    .qb-0 { background: var(--subtle); color: var(--muted); }
+    .person-header-actions { display: flex; gap: 8px; }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-ghost {
+      background: none;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: #ccc; }
+
+    /* Profile strip */
+    .profile-strip {
+      background: #fffdf5;
+      border-bottom: 1px solid #f0e8cc;
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .profile-field { max-width: 260px; }
+    .profile-field .field-label { color: #b08000; }
+    .profile-field .field-value { font-size: 12px; color: #555; }
+
+    /* Timeline */
+    .timeline-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .no-entries {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 48px 0;
+    }
+
+    .entry-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .entry-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafafa;
+    }
+    .entry-date {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .entry-num {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--subtle);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .entry-delete {
+      background: none;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 6px;
+      line-height: 1;
+      border-radius: 4px;
+    }
+    .entry-delete:hover { color: var(--red); background: var(--red-light); }
+    .entry-body {
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .entry-field { }
+    .entry-field.full { grid-column: 1 / -1; }
+    .field-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .field-value {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .field-value.empty { color: #ccc; font-style: italic; }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal {
+      background: var(--surface);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); background: var(--subtle); }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-row { margin-bottom: 16px; }
+    .form-row:last-child { margin-bottom: 0; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 64px; line-height: 1.5; }
+    .form-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+    }
+    .form-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #bbb;
+      margin-bottom: 14px;
+    }
+
+    /* ── Insights tab ── */
+    .insights-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 28px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .insights-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .insights-header h2 { font-size: 20px; font-weight: 700; }
+    .insights-header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .btn-print {
+      background: #0f0f0f;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-print:hover { background: #333; }
+
+    .insight-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .insight-section-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .insight-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .insight-section-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .insight-section-body { padding: 20px 24px 24px; }
+    .insight-col-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .insight-empty {
+      font-size: 13px;
+      color: #999;
+      font-style: italic;
+    }
+    .insight-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .insight-three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Stats row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .stat-cell {
+      background: var(--surface);
+      padding: 18px 20px;
+      text-align: center;
+    }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1; }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* Word cloud */
+    .word-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+    }
+    .cloud-word {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-weight: 600;
+      line-height: 1.3;
+      cursor: default;
+    }
+
+    /* Theme list */
+    .theme-list { display: flex; flex-direction: column; gap: 8px; }
+    .theme-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .theme-bar-wrap {
+      flex: 1;
+      height: 8px;
+      background: var(--subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .theme-bar { height: 100%; border-radius: 4px; }
+    .theme-label { font-size: 13px; color: var(--text); min-width: 140px; }
+    .theme-count { font-size: 12px; color: var(--muted); min-width: 28px; text-align: right; }
+
+    /* Market split */
+    .market-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .market-col h4 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .market-col .word-cloud .cloud-word { font-size: 12px; }
+
+    /* Verbatims */
+    .verbatim-list { display: flex; flex-direction: column; gap: 10px; }
+    .verbatim-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .verbatim-text { font-size: 13px; color: var(--text); line-height: 1.5; font-style: italic; }
+    .verbatim-meta { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    @media print {
+      .topbar, .sidebar, .btn-print { display: none !important; }
+      body { overflow: visible; height: auto; }
+      .layout { display: block; }
+      .main { overflow: visible; }
+      .insights-area { overflow: visible; }
+    }
+
+    /* Colors for avatars */
+    .color-0 { background: #2563eb; }
+    .color-1 { background: #7c3aed; }
+    .color-2 { background: #db2777; }
+    .color-3 { background: #dc2626; }
+    .color-4 { background: #d97706; }
+    .color-5 { background: #16a34a; }
+    .color-6 { background: #0891b2; }
+    .color-7 { background: #9333ea; }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">People Intel</span>
+      <span class="topbar-sub">VerkadaWin</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-topbar" onclick="exportData()">Export</button>
+        <label class="btn-topbar">Import<input type="file" accept=".json" onchange="importData(event)" style="display:none;" /></label>
+        <button class="btn-topbar" onclick="showInsights()" id="btn-insights">Insights</button>
+        <button class="btn-add-person" onclick="openAddPerson()">+ Add Person</button>
+      </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" id="search-input" placeholder="Search people..." oninput="renderSidebar()" />
+      </div>
+      <div class="person-list" id="person-list"></div>
+    </div>
+
+    <!-- Main -->
+    <div class="main" id="main-panel">
+      <div class="empty-state">
+        <div class="icon">👤</div>
+        <p>Select a person or add your first rep.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Modals ── -->
+  <div id="modal-container"></div>
+
+  <script>
+    // ── Data layer ──
+    const STORAGE_KEY = 'verkada-people-intel';
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { people: [], entries: [] }; }
+      catch { return { people: [], entries: [] }; }
+    }
+    function save(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+    let db = load();
+    let selectedPersonId = null;
+
+    // ── Utilities ──
+    function initials(name) {
+      return name.split(' ').filter(Boolean).slice(0,2).map(w => w[0].toUpperCase()).join('');
+    }
+    function colorClass(idx) { return `color-${idx % 8}`; }
+    function todayStr() { return new Date().toISOString().slice(0,10); }
+    function fmtDate(str) {
+      if (!str) return '';
+      const [y,m,d] = str.split('-');
+      return new Date(y, m-1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+
+    // ── Sidebar ──
+    function renderSidebar() {
+      const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const list = document.getElementById('person-list');
+      const people = db.people.filter(p => p.name.toLowerCase().includes(q));
+      if (!people.length) {
+        list.innerHTML = `<div class="sidebar-empty">No people yet.<br/>Hit "+ Add Person" to start.</div>`;
+        return;
+      }
+      list.innerHTML = people.map((p, i) => {
+        const entryCount = db.entries.filter(e => e.personId === p.id).length;
+        return `
+          <div class="person-item ${selectedPersonId === p.id ? 'active' : ''}" onclick="selectPerson('${p.id}')">
+            <div class="person-avatar ${colorClass(i)}">${initials(p.name)}</div>
+            <div class="person-info">
+              <div class="person-name">${p.name}</div>
+              <div class="person-meta">${p.market || ''} · ${entryCount} 1:1${entryCount !== 1 ? 's' : ''}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Select person ──
+    function selectPerson(id) {
+      selectedPersonId = id;
+      renderSidebar();
+      renderPersonPanel();
+    }
+
+    // ── Person panel ──
+    function renderPersonPanel() {
+      const panel = document.getElementById('main-panel');
+      const p = db.people.find(x => x.id === selectedPersonId);
+      if (!p) { panel.innerHTML = `<div class="empty-state"><div class="icon">👤</div><p>Select a person or add your first rep.</p></div>`; return; }
+
+      const personIdx = db.people.indexOf(p);
+      const entries = db.entries.filter(e => e.personId === p.id).sort((a,b) => b.date.localeCompare(a.date));
+
+      const profileFields = [
+        { key: 'whyVerkada', label: 'Why Verkada' },
+        { key: 'longTermGoal', label: 'Long-Term Goal' },
+        { key: 'tenure', label: 'Tenure' },
+        { key: 'dontTouch', label: "Don't Touch" },
+        { key: 'hiddenProblem', label: 'Hidden Problem' },
+      ];
+      const filledProfile = profileFields.filter(f => p[f.key]);
+
+      panel.innerHTML = `
+        <div class="person-panel">
+          <div class="person-header">
+            <div class="person-header-left">
+              <div class="person-header-avatar ${colorClass(personIdx)}">${initials(p.name)}</div>
+              <div>
+                <div class="person-header-name">${p.name}</div>
+                <div class="person-header-meta">
+                  ${p.role ? `<span>${p.role}</span>` : ''}
+                  ${p.market ? `<span>${p.market}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="person-header-actions">
+              <button class="btn-ghost" onclick="openEditPerson('${p.id}')">Edit Profile</button>
+              <button class="btn-primary" onclick="openAddEntry('${p.id}')">+ Log 1:1</button>
+            </div>
+          </div>
+          ${filledProfile.length ? `
+          <div class="profile-strip">
+            ${filledProfile.map(f => `
+              <div class="profile-field">
+                <div class="field-label">${f.label}</div>
+                <div class="field-value">${escHtml(p[f.key])}</div>
+              </div>`).join('')}
+          </div>` : ''}
+          <div class="timeline-area">
+            ${entries.length === 0
+              ? `<div class="no-entries">No 1:1s logged yet. Hit "+ Log 1:1" to start.</div>`
+              : entries.map((e, i) => renderEntryCard(e, entries.length - i)).join('')
+            }
+          </div>
+        </div>`;
+    }
+
+    function renderEntryCard(e, num) {
+      const fields = [
+        { key: 'story',      label: "Their Story / Background" },
+        { key: 'goals',      label: "Goals" },
+        { key: 'frustrations', label: "Frustrations" },
+        { key: 'pipeline',   label: "Pipeline / Biggest Deals" },
+        { key: 'broken',     label: "What's Broken" },
+        { key: 'working',    label: "What's Working" },
+        { key: 'needs',      label: "What They Need" },
+        { key: 'commitments',label: "Commitments I Made", full: true },
+        { key: 'notes',      label: "Free Notes", full: true },
+      ];
+      const filledFields = fields.filter(f => e[f.key]);
+      if (!filledFields.length) return '';
+      return `
+        <div class="entry-card">
+          <div class="entry-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="entry-date">${fmtDate(e.date)}</span>
+              <span class="entry-num">1:1 #${num}</span>
+            </div>
+            <button class="entry-delete" onclick="deleteEntry('${e.id}')" title="Delete">×</button>
+          </div>
+          <div class="entry-body">
+            ${filledFields.map(f => `
+              <div class="entry-field ${f.full ? 'full' : ''}">
+                <div class="field-label">${f.label}</div>
+                <div class="field-value">${escHtml(e[f.key])}</div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }
+
+    function escHtml(str) {
+      return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Add Person modal ──
+    function openAddPerson() { showPersonModal(null); }
+    function openEditPerson(id) { showPersonModal(db.people.find(p => p.id === id)); }
+
+    function showPersonModal(person) {
+      const isEdit = !!person;
+      const mc = document.getElementById('modal-container');
+      mc.innerHTML = `
+        <div class="modal-overlay" onclick="closeModalOnOverlay(event)">
+          <div class="modal">
+            <div class="modal-header">
+              <span class="modal-title">${isEdit ? 'Edit Person' : 'Add Person'}</span>
+              <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-grid form-row">
+                <div>
+                  <label>Full Name *</label>
+                  <input type="text" id="f-name" value="${escHtml(person?.name || '')}" placeholder="First Last" />
+                </div>
+                <div>
+                  <label>Role / Title</label>
+                  <input type="text" id="f-role" value="${escHtml(person?.role || '')}" placeholder="AE, SDR, SE..." />
+                </div>
+              </div>
+              <div class="form-grid form-row">
+                <div>
+                  <label>Market</label>
+                  <select id="f-market">
+                    <option value="">—</option>
+                    <option value="Salt Lake City" ${person?.market === 'Salt Lake City' ? 'selected' : ''}>Salt Lake City</option>
+                    <option value="Chicago" ${person?.market === 'Chicago' ? 'selected' : ''}>Chicago</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Tenure</label>
+                  <input type="text" id="f-tenure" value="${escHtml(person?.tenure || '')}" placeholder="e.g. 2 yrs at Verkada, 5 yrs in sales" />
+                </div>
+              </div>
+              <div class="form-divider"></div>
+              <div class="form-section-label">Their Story</div>
+              <div class="form-row">
+                <label>Why Verkada? Personal reason for being here.</label>
+                <textarea id="f-whyVerkada" placeholder="What brought them here? What keeps them here? Family, money, mission, growth...">${escHtml(person?.whyVerkada || '')}</textarea>
+              </div>
+              <div class="form-row">
+                <label>Long-Term Goal</label>
+                <textarea id="f-longTermGoal" placeholder="Where do they want to be in 3-5 years? Leadership, entrepreneurship, stay in sales...">${escHtml(person?.longTermGoal || '')}</textarea>
+              </div>
+              <div class="form-divider"></div>
+              <div class="form-section-label">First 1:1 Intel</div>
+              <div class="form-row">
+                <label>What is one thing that's working that you don't want me to touch?</label>
+                <textarea id="f-dontTouch" placeholder="What do they want protected? A process, a freedom, a team dynamic...">${escHtml(person?.dontTouch || '')}</textarea>
+              </div>
+              <div class="form-row">
+                <label>What's something that needs fixing that nobody is talking about?</label>
+                <textarea id="f-hiddenProblem" placeholder="The real signal. What's broken under the surface that nobody says out loud...">${escHtml(person?.hiddenProblem || '')}</textarea>
+              </div>
+              ${isEdit ? `
+              <div class="form-divider"></div>
+              <div style="text-align:right;">
+                <button class="btn-ghost" onclick="deletePerson('${person.id}')" style="color:var(--red);border-color:var(--red);">Delete Person</button>
+              </div>` : ''}
+            </div>
+            <div class="modal-footer">
+              <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+              <button class="btn-primary" onclick="savePerson(${isEdit ? `'${person.id}'` : 'null'})">${isEdit ? 'Save Changes' : 'Add Person'}</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function savePerson(id) {
+      const name = document.getElementById('f-name').value.trim();
+      if (!name) { alert('Name is required.'); return; }
+      const fields = {
+        role:          document.getElementById('f-role').value.trim(),
+        market:        document.getElementById('f-market').value,
+        tenure:        document.getElementById('f-tenure').value.trim(),
+        whyVerkada:    document.getElementById('f-whyVerkada').value.trim(),
+        longTermGoal:  document.getElementById('f-longTermGoal').value.trim(),
+        dontTouch:     document.getElementById('f-dontTouch').value.trim(),
+        hiddenProblem: document.getElementById('f-hiddenProblem').value.trim(),
+      };
+      if (id) {
+        Object.assign(db.people.find(x => x.id === id), { name, ...fields });
+      } else {
+        db.people.push({ id: uid(), name, ...fields });
+      }
+      save(db);
+      closeModal();
+      renderSidebar();
+      if (id === selectedPersonId || !id) renderPersonPanel();
+    }
+
+    function deletePerson(id) {
+      if (!confirm('Delete this person and all their 1:1 notes? This cannot be undone.')) return;
+      db.people = db.people.filter(p => p.id !== id);
+      db.entries = db.entries.filter(e => e.personId !== id);
+      save(db);
+      if (selectedPersonId === id) selectedPersonId = null;
+      closeModal();
+      renderSidebar();
+      renderPersonPanel();
+    }
+
+    // ── Add Entry modal ──
+    function openAddEntry(personId) {
+      const mc = document.getElementById('modal-container');
+      mc.innerHTML = `
+        <div class="modal-overlay" onclick="closeModalOnOverlay(event)">
+          <div class="modal">
+            <div class="modal-header">
+              <span class="modal-title">Log a 1:1</span>
+              <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-row">
+                <label>Date</label>
+                <input type="date" id="e-date" value="${todayStr()}" />
+              </div>
+              <div class="form-section-label">The Conversation</div>
+              <div class="form-grid form-row">
+                <div>
+                  <label>Their Story / Background</label>
+                  <textarea id="e-story" placeholder="Where they came from, what drives them..."></textarea>
+                </div>
+                <div>
+                  <label>Goals</label>
+                  <textarea id="e-goals" placeholder="What do they want? Promotion, money, impact..."></textarea>
+                </div>
+              </div>
+              <div class="form-grid form-row">
+                <div>
+                  <label>Frustrations</label>
+                  <textarea id="e-frustrations" placeholder="What's slowing them down or draining them..."></textarea>
+                </div>
+                <div>
+                  <label>Pipeline / Biggest Deals</label>
+                  <textarea id="e-pipeline" placeholder="Key deals, top accounts, pipeline health..."></textarea>
+                </div>
+              </div>
+              <div class="form-grid form-row">
+                <div>
+                  <label>What's Broken</label>
+                  <textarea id="e-broken" placeholder="Process, tools, support gaps..."></textarea>
+                </div>
+                <div>
+                  <label>What's Working</label>
+                  <textarea id="e-working" placeholder="Give credit where it's due..."></textarea>
+                </div>
+              </div>
+              <div class="form-row">
+                <label>What They Need From Me</label>
+                <textarea id="e-needs" placeholder="Coaching, air cover, resources, introductions..."></textarea>
+              </div>
+              <div class="form-divider"></div>
+              <div class="form-row">
+                <label>⚠ Commitments I Made</label>
+                <textarea id="e-commitments" placeholder="Track anything you said you'd do. Don't make promises you won't keep."></textarea>
+              </div>
+              <div class="form-row">
+                <label>Free Notes</label>
+                <textarea id="e-notes" placeholder="Anything else worth remembering..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+              <button class="btn-primary" onclick="saveEntry('${personId}')">Save 1:1</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function saveEntry(personId) {
+      const entry = {
+        id: uid(),
+        personId,
+        date:        document.getElementById('e-date').value,
+        story:       document.getElementById('e-story').value.trim(),
+        goals:       document.getElementById('e-goals').value.trim(),
+        frustrations:document.getElementById('e-frustrations').value.trim(),
+        pipeline:    document.getElementById('e-pipeline').value.trim(),
+        broken:      document.getElementById('e-broken').value.trim(),
+        working:     document.getElementById('e-working').value.trim(),
+        needs:       document.getElementById('e-needs').value.trim(),
+        commitments: document.getElementById('e-commitments').value.trim(),
+        notes:       document.getElementById('e-notes').value.trim(),
+      };
+      db.entries.push(entry);
+      save(db);
+      closeModal();
+      renderSidebar();
+      renderPersonPanel();
+    }
+
+    function deleteEntry(id) {
+      if (!confirm('Delete this 1:1 entry?')) return;
+      db.entries = db.entries.filter(e => e.id !== id);
+      save(db);
+      renderSidebar();
+      renderPersonPanel();
+    }
+
+    // ── Modal helpers ──
+    function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+    function closeModalOnOverlay(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
+
+    // ── Insights ──
+    const STOPWORDS = new Set(['the','and','to','a','of','in','is','it','that','for','on','are','with','as','at','be','this','was','have','or','but','not','their','from','they','i','my','we','our','your','he','she','his','her','you','do','what','want','just','so','me','an','if','up','by','about','can','has','had','all','been','one','also','more','its','would','will','get','when','how','no','go','very','some','than','then','them','there','need','make','too','who','out','like','into','over','after','about','any','here','know','work','really','could','think','feel','been','did','got','us','well','way','much','even','now','just','see','him','her','new','time','used']);
+
+    function tokenize(text) {
+      return (text || '').toLowerCase().replace(/[^a-z\s'-]/g, ' ').split(/\s+/).filter(w => w.length > 2 && !STOPWORDS.has(w));
+    }
+
+    function wordFreq(texts) {
+      const freq = {};
+      texts.forEach(t => tokenize(t).forEach(w => { freq[w] = (freq[w] || 0) + 1; }));
+      return Object.entries(freq).sort((a,b) => b[1]-a[1]);
+    }
+
+    function showInsights() {
+      selectedPersonId = null;
+      renderSidebar();
+      const panel = document.getElementById('main-panel');
+
+      const people = db.people;
+      const entries = db.entries;
+      const totalEntries = entries.length;
+
+      const slc = people.filter(p => p.market === 'Salt Lake City');
+      const chi = people.filter(p => p.market === 'Chicago');
+      const slcIds = new Set(slc.map(p => p.id));
+      const chiIds = new Set(chi.map(p => p.id));
+
+      // Gather all text by category
+      const cats = [
+        { key: 'hiddenProblem', label: 'Hidden Problems Nobody Is Talking About', color: '#dc2626', bg: '#fef2f2' },
+        { key: 'dontTouch',     label: "What's Working — Don't Touch",            color: '#16a34a', bg: '#f0fdf4' },
+        { key: 'whyVerkada',    label: 'Why Verkada',                             color: '#7c3aed', bg: '#f5f3ff' },
+        { key: 'longTermGoal',  label: 'Long-Term Goals',                         color: '#d97706', bg: '#fffbeb' },
+      ];
+      const entryCats = [
+        { key: 'broken',       label: "What's Broken",        color: '#dc2626' },
+        { key: 'frustrations', label: 'Frustrations',         color: '#f97316' },
+        { key: 'needs',        label: 'What They Need',       color: '#2563eb' },
+        { key: 'working',      label: "What's Working",       color: '#16a34a' },
+        { key: 'goals',        label: 'Goals',                color: '#7c3aed' },
+      ];
+
+      // Build all-text word cloud
+      const allTexts = [
+        ...people.flatMap(p => [p.hiddenProblem, p.dontTouch, p.whyVerkada, p.longTermGoal]),
+        ...entries.flatMap(e => [e.broken, e.frustrations, e.needs, e.working, e.goals, e.story, e.notes]),
+      ].filter(Boolean);
+      const topWords = wordFreq(allTexts).slice(0, 50);
+      const maxFreq = topWords[0]?.[1] || 1;
+
+      function cloudHTML(words, accent) {
+        if (!words.length) return '<span class="insight-empty">Not enough data yet — keep logging 1:1s.</span>';
+        return words.map(([w, c]) => {
+          const size = 11 + Math.round((c / maxFreq) * 22);
+          const opacity = 0.5 + (c / maxFreq) * 0.5;
+          return `<span class="cloud-word" style="font-size:${size}px;opacity:${opacity};background:${accent}18;color:${accent};">${w} <span style="font-size:10px;opacity:0.7;">${c}</span></span>`;
+        }).join('');
+      }
+
+      function themeHTML(words, color, limit=8) {
+        if (!words.length) return '<span class="insight-empty">Not enough data yet.</span>';
+        const max = words[0]?.[1] || 1;
+        return `<div class="theme-list">${words.slice(0,limit).map(([w,c]) => `
+          <div class="theme-row">
+            <span class="theme-label">${w}</span>
+            <div class="theme-bar-wrap"><div class="theme-bar" style="width:${Math.round(c/max*100)}%;background:${color};"></div></div>
+            <span class="theme-count">${c}</span>
+          </div>`).join('')}</div>`;
+      }
+
+      function verbatimHTML(field, limit=5) {
+        const items = people.filter(p => p[field]).slice(0, limit);
+        if (!items.length) return '<span class="insight-empty">None recorded yet.</span>';
+        return `<div class="verbatim-list">${items.map(p => `
+          <div class="verbatim-card">
+            <div class="verbatim-text">"${escHtml(p[field])}"</div>
+            <div class="verbatim-meta">${escHtml(p.name)} · ${p.market || 'No market'} · ${p.role || ''}</div>
+          </div>`).join('')}</div>`;
+      }
+
+      // Market word clouds
+      function marketTexts(ids, catKeys) {
+        return [
+          ...people.filter(p => ids.has(p.id)).flatMap(p => catKeys.map(k => p[k])),
+          ...entries.filter(e => ids.has(e.personId)).flatMap(e => catKeys.map(k => e[k])),
+        ].filter(Boolean);
+      }
+      const slcWords = wordFreq(marketTexts(slcIds, ['hiddenProblem','broken','frustrations','needs'])).slice(0,20);
+      const chiWords = wordFreq(marketTexts(chiIds, ['hiddenProblem','broken','frustrations','needs'])).slice(0,20);
+
+      panel.innerHTML = `
+        <div class="person-panel">
+          <div class="person-header" style="background:#0f0f0f;">
+            <div class="person-header-left">
+              <div style="color:#fff;">
+                <div class="person-header-name" style="color:#fff;">Team Insights</div>
+                <div class="person-header-meta" style="color:#666;">${people.length} people · ${totalEntries} 1:1s logged</div>
+              </div>
+            </div>
+            <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+          </div>
+
+          <div class="insights-area">
+
+            <!-- Stats -->
+            <div class="stats-grid">
+              <div class="stat-cell"><div class="stat-value">${people.length}</div><div class="stat-label">People</div></div>
+              <div class="stat-cell"><div class="stat-value">${totalEntries}</div><div class="stat-label">1:1s Logged</div></div>
+              <div class="stat-cell"><div class="stat-value">${slc.length}</div><div class="stat-label">Salt Lake City</div></div>
+              <div class="stat-cell"><div class="stat-value">${chi.length}</div><div class="stat-label">Chicago</div></div>
+            </div>
+
+            <!-- Master word cloud -->
+            <div class="insight-section">
+              <div class="insight-section-header">
+                <div>
+                  <div class="insight-section-title">Master Theme Cloud</div>
+                  <div class="insight-section-sub">All people, all fields combined — sized by frequency</div>
+                </div>
+              </div>
+              <div class="insight-section-body">
+                <div class="word-cloud">${cloudHTML(topWords, '#2563eb')}</div>
+              </div>
+            </div>
+
+            <!-- Hidden Problems -->
+            <div class="insight-section">
+              <div class="insight-section-header">
+                <div>
+                  <div class="insight-section-title" style="color:#dc2626;">Hidden Problems Nobody Is Talking About</div>
+                  <div class="insight-section-sub">${people.filter(p=>p.hiddenProblem).length} of ${people.length} people answered</div>
+                </div>
+              </div>
+              <div class="insight-section-body insight-two-col">
+                <div>
+                  <div class="insight-col-label">Top Themes</div>
+                  ${themeHTML(wordFreq(people.map(p=>p.hiddenProblem).filter(Boolean)), '#dc2626')}
+                </div>
+                <div>
+                  <div class="insight-col-label">Verbatims</div>
+                  ${verbatimHTML('hiddenProblem')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Don't Touch -->
+            <div class="insight-section">
+              <div class="insight-section-header">
+                <div>
+                  <div class="insight-section-title" style="color:#16a34a;">What's Working — Don't Touch</div>
+                  <div class="insight-section-sub">${people.filter(p=>p.dontTouch).length} of ${people.length} people answered</div>
+                </div>
+              </div>
+              <div class="insight-section-body insight-two-col">
+                <div>
+                  <div class="insight-col-label">Top Themes</div>
+                  ${themeHTML(wordFreq(people.map(p=>p.dontTouch).filter(Boolean)), '#16a34a')}
+                </div>
+                <div>
+                  <div class="insight-col-label">Verbatims</div>
+                  ${verbatimHTML('dontTouch')}
+                </div>
+              </div>
+            </div>
+
+            <!-- 1:1 entry themes -->
+            <div class="insight-section">
+              <div class="insight-section-header">
+                <div>
+                  <div class="insight-section-title">1:1 Conversation Themes</div>
+                  <div class="insight-section-sub">Across all ${totalEntries} logged sessions</div>
+                </div>
+              </div>
+              <div class="insight-section-body">
+                ${totalEntries === 0
+                  ? `<span class="insight-empty">No 1:1s logged yet — hit "+ Log 1:1" on any person to start. Profile field themes (above) come from the Add Person form.</span>`
+                  : `<div class="insight-three-col">${entryCats.map(c => `
+                      <div>
+                        <div class="insight-col-label" style="color:${c.color};">${c.label}</div>
+                        ${themeHTML(wordFreq(entries.map(e=>e[c.key]).filter(Boolean)), c.color, 6)}
+                      </div>`).join('')}</div>`}
+              </div>
+            </div>
+
+            <!-- SLC vs Chicago -->
+            <div class="insight-section">
+              <div class="insight-section-header">
+                <div>
+                  <div class="insight-section-title">Market Breakdown</div>
+                  <div class="insight-section-sub">Top themes from problems + frustrations by market</div>
+                </div>
+              </div>
+              <div class="insight-section-body insight-two-col">
+                <div>
+                  <div class="insight-col-label">Salt Lake City (${slc.length})</div>
+                  <div class="word-cloud">${cloudHTML(slcWords, '#2563eb')}</div>
+                </div>
+                <div>
+                  <div class="insight-col-label">Chicago (${chi.length})</div>
+                  <div class="word-cloud">${cloudHTML(chiWords, '#7c3aed')}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Why Verkada -->
+            <div class="insight-section">
+              <div class="insight-section-header">
+                <div>
+                  <div class="insight-section-title">Why Verkada</div>
+                  <div class="insight-section-sub">What's keeping your people here</div>
+                </div>
+              </div>
+              <div class="insight-section-body insight-two-col">
+                <div>
+                  <div class="insight-col-label">Top Themes</div>
+                  ${themeHTML(wordFreq(people.map(p=>p.whyVerkada).filter(Boolean)), '#7c3aed')}
+                </div>
+                <div>
+                  <div class="insight-col-label">Verbatims</div>
+                  ${verbatimHTML('whyVerkada')}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>`;
+    }
+
+    // ── Export / Import ──
+    function exportData() {
+      const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `people-intel-${todayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!imported.people || !imported.entries) throw new Error('Invalid file.');
+          if (!confirm(`Import ${imported.people.length} people and ${imported.entries.length} entries? This will replace your current data.`)) return;
+          db = imported;
+          save(db);
+          selectedPersonId = null;
+          renderSidebar();
+          renderPersonPanel();
+        } catch {
+          alert('Could not read that file. Make sure it\'s a People Intel export.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // ── Init ──
+    renderSidebar();
+    renderPersonPanel();
+  </script>
+</body>
+</html>
