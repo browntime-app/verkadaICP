@@ -139,19 +139,30 @@
 
     /* ── Grid ── */
     .icp-grid {
-      display: grid;
-      grid-template-columns: 290px 1fr;
+      display: flex;
       gap: 10px;
-      padding: 14px 18px 36px;
-      align-items: start;
-      grid-template-areas:
-        "desc      metrics"
-        "why       outreach"
-        "char      discovery"
-        "examples  personas"
-        "opp       plays"
-        "battle    battle"
-        "products  products";
+      padding: 14px 18px 0;
+      align-items: flex-start;
+    }
+    .icp-left-col {
+      width: 290px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .icp-right-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .icp-full {
+      padding: 0 18px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
     }
 
     /* ── Cards ── */
@@ -1308,161 +1319,96 @@ function renderPanels() {
         </div>
       </div>
 
-      <!-- Grid -->
+      <!-- Two-column layout -->
       <div class="icp-grid">
+        <div class="icp-left-col">
 
-        <!-- Description -->
-        <div class="card c-desc">
-          <div class="ch hd-teal">
-            <span class="ch-icon">📋</span>
-            <div><div class="ch-title">Description</div></div>
+          <div class="card">
+            <div class="ch hd-teal"><span class="ch-icon">📋</span><div><div class="ch-title">Description</div></div></div>
+            <div class="cb"><ul class="blist">${icp.description.map(d=>`<li>${d}</li>`).join('')}</ul></div>
           </div>
-          <div class="cb">
-            <ul class="blist">
-              ${icp.description.map(d=>`<li>${d}</li>`).join('')}
-            </ul>
+
+          <div class="card">
+            <div class="ch hd-indigo"><span class="ch-icon">⚡</span><div><div class="ch-title">Why They Need Verkada</div></div></div>
+            <div class="cb"><ul class="blist">${icp.why.map(w=>`<li>${w}</li>`).join('')}</ul></div>
           </div>
+
+          <div class="card">
+            <div class="ch hd-teal2"><span class="ch-icon">🏢</span><div><div class="ch-title">Common Characteristics</div></div></div>
+            <div class="cb"><ul class="blist">${icp.characteristics.map(c=>`<li>${c}</li>`).join('')}</ul></div>
+          </div>
+
+          <div class="card">
+            <div class="ch hd-slate"><span class="ch-icon">🏷️</span><div><div class="ch-title">Example Companies</div></div></div>
+            <div class="cb"><div class="ex-grid">${icp.examples.map(e=>`<span class="ex-pill">${e}</span>`).join('')}</div></div>
+          </div>
+
+          <div class="card">
+            <div class="ch hd-dark"><span class="ch-icon">💡</span><div><div class="ch-title">Opportunity</div><div class="ch-sub">SLC &amp; Chicago Territory</div></div></div>
+            <div class="cb"><div class="opp-list">${icp.opp.map(o=>`<div class="opp-item">${o}</div>`).join('')}</div></div>
+          </div>
+
         </div>
+        <div class="icp-right-col">
 
-        <!-- Characteristics -->
-        <div class="card c-char">
-          <div class="ch hd-teal2">
-            <span class="ch-icon">🏢</span>
-            <div><div class="ch-title">Common Characteristics</div></div>
+          <div class="card">
+            <div class="ch hd-blue"><span class="ch-icon">📊</span><div><div class="ch-title">Success Metrics</div><div class="ch-sub">What this ICP measures to justify the buy</div></div></div>
+            <div class="cb"><ul class="blist">${icp.metrics.map(m=>`<li>${m}</li>`).join('')}</ul></div>
           </div>
-          <div class="cb">
-            <ul class="blist">
-              ${icp.characteristics.map(c=>`<li>${c}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
 
-        <!-- Example Companies -->
-        <div class="card c-examples">
-          <div class="ch hd-slate">
-            <span class="ch-icon">🏷️</span>
-            <div><div class="ch-title">Example Companies</div></div>
-          </div>
-          <div class="cb">
-            <div class="ex-grid">
-              ${icp.examples.map(e=>`<span class="ex-pill">${e}</span>`).join('')}
+          <div class="card">
+            <div class="ch hd-emerald"><span class="ch-icon">✉️</span><div><div class="ch-title">Initial Outreach</div><div class="ch-sub">Cold email copy — problem-first, no fluff, ready to send</div></div></div>
+            <div class="cb">
+              <div class="email-grid">
+                ${icp.outreach.map(e=>`<div class="email-item"><div class="email-body">${e.body}</div></div>`).join('')}
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Success Metrics -->
-        <div class="card c-metrics">
-          <div class="ch hd-blue">
-            <span class="ch-icon">📊</span>
-            <div><div class="ch-title">Success Metrics</div><div class="ch-sub">What this ICP measures to justify the buy</div></div>
+          <div class="card">
+            <div class="ch hd-cyan"><span class="ch-icon">🔍</span><div><div class="ch-title">Key Discovery Questions</div><div class="ch-sub">Ask these in your first qualifying meeting</div></div></div>
+            <div class="cb"><div class="q-list">${icp.discovery.map(q=>`<div class="q-item">${q}</div>`).join('')}</div></div>
           </div>
-          <div class="cb">
-            <ul class="blist">
-              ${icp.metrics.map(m=>`<li>${m}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
 
-        <!-- Key Discovery Questions -->
-        <div class="card c-discovery">
-          <div class="ch hd-cyan">
-            <span class="ch-icon">🔍</span>
-            <div><div class="ch-title">Key Discovery Questions</div><div class="ch-sub">Ask these in your first qualifying meeting</div></div>
-          </div>
-          <div class="cb">
-            <div class="q-list">
-              ${icp.discovery.map(q=>`<div class="q-item">${q}</div>`).join('')}
+          <div class="card">
+            <div class="ch hd-purple"><span class="ch-icon">👤</span><div><div class="ch-title">Key Personas</div><div class="ch-sub">Who you're selling to — and who's in the room</div></div></div>
+            <div class="cb">
+              <div class="personas-row">
+                ${icp.personas.map((p,pi)=>`
+                  <div class="persona-card">
+                    <div class="p-avatar" style="background:${p.color};">${p.abbr}</div>
+                    <div class="p-num">${pi+1}.</div>
+                    <div class="p-title">${p.title}</div>
+                    <div class="p-dept">${p.dept}</div>
+                  </div>`).join('')}
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Why Verkada -->
-        <div class="card c-why" style="align-self:stretch;">
-          <div class="ch hd-indigo">
-            <span class="ch-icon">⚡</span>
-            <div><div class="ch-title">Why They Need Verkada</div></div>
-          </div>
-          <div class="cb">
-            <ul class="blist">
-              ${icp.why.map(w=>`<li>${w}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
-
-        <!-- Key Personas -->
-        <div class="card c-personas">
-          <div class="ch hd-purple">
-            <span class="ch-icon">👤</span>
-            <div><div class="ch-title">Key Personas</div><div class="ch-sub">Who you're selling to — and who's in the room</div></div>
-          </div>
-          <div class="cb">
-            <div class="personas-row">
-              ${icp.personas.map((p,pi)=>`
-                <div class="persona-card">
-                  <div class="p-avatar" style="background:${p.color};">${p.abbr}</div>
-                  <div class="p-num">${pi+1}.</div>
-                  <div class="p-title">${p.title}</div>
-                  <div class="p-dept">${p.dept}</div>
-                </div>`).join('')}
+          <div class="card">
+            <div class="ch hd-gray"><span class="ch-icon">▶</span><div><div class="ch-title">Customer Plays</div></div></div>
+            <div class="cb">
+              <div class="play-list">
+                ${icp.plays.map((pl,pi)=>`
+                  <div class="play-item">
+                    <span class="play-name">${pi+1}. ${pl.name}</span>
+                    ${pl.desc}
+                  </div>`).join('')}
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Customer Plays -->
-        <div class="card c-plays">
-          <div class="ch hd-gray">
-            <span class="ch-icon">▶</span>
-            <div><div class="ch-title">Customer Plays</div></div>
-          </div>
-          <div class="cb">
-            <div class="play-list">
-              ${icp.plays.map((pl,pi)=>`
-                <div class="play-item">
-                  <span class="play-name">${pi+1}. ${pl.name}</span>
-                  ${pl.desc}
-                </div>`).join('')}
-            </div>
-          </div>
         </div>
+      </div>
 
-        <!-- Opportunity -->
-        <div class="card c-opp">
-          <div class="ch hd-dark">
-            <span class="ch-icon">💡</span>
-            <div><div class="ch-title">Opportunity</div><div class="ch-sub">SLC &amp; Chicago Territory</div></div>
-          </div>
-          <div class="cb">
-            <div class="opp-list">
-              ${icp.opp.map(o=>`<div class="opp-item">${o}</div>`).join('')}
-            </div>
-          </div>
-        </div>
+      <!-- Full-width sections -->
+      <div class="icp-full">
 
-        <!-- Initial Outreach -->
-        <div class="card c-outreach">
-          <div class="ch hd-emerald">
-            <span class="ch-icon">✉️</span>
-            <div><div class="ch-title">Initial Outreach</div><div class="ch-sub">Cold email copy — problem-first, no fluff, ready to send</div></div>
-          </div>
-          <div class="cb">
-            <div class="email-grid">
-              ${icp.outreach.map(e => `
-                <div class="email-item">
-                  <div class="email-body">${e.body}</div>
-                </div>`).join('')}
-            </div>
-          </div>
-        </div>
-
-        <!-- Displace the Competition -->
-        <div class="card c-battle">
-          <div class="ch hd-black">
-            <span class="ch-icon">⚔️</span>
-            <div><div class="ch-title">How to Displace the Competition</div><div class="ch-sub">Your edge when Genetec, Avigilon, or the status quo is in the room</div></div>
-          </div>
+        <div class="card">
+          <div class="ch hd-black"><span class="ch-icon">⚔️</span><div><div class="ch-title">How to Displace the Competition</div><div class="ch-sub">Your edge when Genetec, Avigilon, or the status quo is in the room</div></div></div>
           <div class="cb">
             <div class="compete-grid">
-              ${icp.compete.map(c => `
+              ${icp.compete.map(c=>`
                 <div>
                   <div class="compete-col-header">
                     <span class="compete-vs">vs.</span>
@@ -1470,15 +1416,14 @@ function renderPanels() {
                     <span class="compete-win">${c.win}</span>
                   </div>
                   <div class="compete-list">
-                    ${c.bullets.map(b => `<div class="compete-item">${b}</div>`).join('')}
+                    ${c.bullets.map(b=>`<div class="compete-item">${b}</div>`).join('')}
                   </div>
                 </div>`).join('')}
             </div>
           </div>
         </div>
 
-        <!-- Product Lines -->
-        <div class="c-products products-bar">
+        <div class="products-bar">
           <span class="prod-label">Relevant Products</span>
           ${icp.products.map(p=>`<span class="prod-chip" style="background:${p.bg};color:${p.color};">${p.name}</span>`).join('')}
           <span class="prod-note">All products managed via Verkada Command platform</span>
