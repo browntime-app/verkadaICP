@@ -1398,37 +1398,32 @@ function renderPanels() {
             </div>
           </div>
 
-        </div>
-      </div>
-
-      <!-- Full-width sections -->
-      <div class="icp-full">
-
-        <div class="card">
-          <div class="ch hd-black"><span class="ch-icon">⚔️</span><div><div class="ch-title">How to Displace the Competition</div><div class="ch-sub">Your edge when Genetec, Avigilon, or the status quo is in the room</div></div></div>
-          <div class="cb">
-            <div class="compete-grid">
-              ${icp.compete.map(c=>`
-                <div>
-                  <div class="compete-col-header">
-                    <span class="compete-vs">vs.</span>
-                    <span class="compete-name">${c.name}</span>
-                    <span class="compete-win">${c.win}</span>
-                  </div>
-                  <div class="compete-list">
-                    ${c.bullets.map(b=>`<div class="compete-item">${b}</div>`).join('')}
-                  </div>
-                </div>`).join('')}
+          <div class="card">
+            <div class="ch hd-black"><span class="ch-icon">⚔️</span><div><div class="ch-title">How to Displace the Competition</div><div class="ch-sub">Your edge when Genetec, Avigilon, or the status quo is in the room</div></div></div>
+            <div class="cb">
+              <div class="compete-grid">
+                ${icp.compete.map(c=>`
+                  <div>
+                    <div class="compete-col-header">
+                      <span class="compete-vs">vs.</span>
+                      <span class="compete-name">${c.name}</span>
+                      <span class="compete-win">${c.win}</span>
+                    </div>
+                    <div class="compete-list">
+                      ${c.bullets.map(b=>`<div class="compete-item">${b}</div>`).join('')}
+                    </div>
+                  </div>`).join('')}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="products-bar">
-          <span class="prod-label">Relevant Products</span>
-          ${icp.products.map(p=>`<span class="prod-chip" style="background:${p.bg};color:${p.color};">${p.name}</span>`).join('')}
-          <span class="prod-note">All products managed via Verkada Command platform</span>
-        </div>
+          <div class="products-bar">
+            <span class="prod-label">Relevant Products</span>
+            ${icp.products.map(p=>`<span class="prod-chip" style="background:${p.bg};color:${p.color};">${p.name}</span>`).join('')}
+            <span class="prod-note">All products managed via Verkada Command platform</span>
+          </div>
 
+        </div>
       </div>
     </div>
   `).join('');
