@@ -141,16 +141,17 @@
     .icp-grid {
       display: grid;
       grid-template-columns: 290px 1fr 230px;
+      gap: 10px;
+      padding: 14px 18px 36px;
+      align-items: start;
       grid-template-areas:
         "desc     metrics    why"
         "char     discovery  why"
         "examples personas   personas"
         ".        plays      opp"
+        "outreach outreach   outreach"
         "battle   battle     battle"
         "products products   products";
-      gap: 10px;
-      padding: 14px 18px 36px;
-      align-items: start;
     }
 
     /* ── Cards ── */
@@ -341,6 +342,36 @@
     }
     .q-item strong { font-style: normal; color: #1d4ed8; }
 
+    /* ── Outreach ── */
+    .hd-emerald { background: #15803d; }
+    .c-outreach { grid-area: outreach; }
+    .email-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .email-item {
+      padding: 10px 12px;
+      background: #f0fdf4;
+      border-radius: 6px;
+      border-left: 3px solid #16a34a;
+    }
+    .email-to {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #15803d;
+      margin-bottom: 4px;
+    }
+    .email-subject {
+      font-size: 12px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 6px;
+    }
+    .email-body {
+      font-size: 12px;
+      color: #4b5563;
+      line-height: 1.55;
+    }
+
     /* ── Compete ── */
     .hd-black { background: #111827; }
     .c-battle { grid-area: battle; }
@@ -476,6 +507,18 @@ const ICPs = [
       'Chicago: Evanston, Naperville, Skokie suburban districts — 20–50 schools each',
       'Sweet spot: 5–25 campus districts with full budget authority (no enterprise bureaucracy)',
     ],
+    outreach: [
+      {
+        to: 'Director of Public Safety / SRO',
+        subject: 'The 30-minute footage retrieval problem',
+        body: 'Most SROs and safety directors we talk to can describe the last time they needed footage fast and didn\'t get it — the DVR was offline, at the wrong building, or the person who knew how to pull it wasn\'t available. If you\'re still running campus-by-campus DVRs, you\'re one incident away from a board question you can\'t answer. Worth 15 minutes to see what districts like Granite are doing instead?',
+      },
+      {
+        to: 'Superintendent',
+        subject: 'What your board will ask after the next safety incident',
+        body: 'The question isn\'t whether your campuses are monitored. It\'s whether your team can access any campus, any footage, from one place, in under five minutes. Most superintendents we talk to can\'t — not because of budget, but because infrastructure built 10 years ago wasn\'t designed for that. Happy to show you what a one-tap lockdown across all your buildings looks like from a phone.',
+      },
+    ],
     discovery: [
       '"Walk me through what happens the moment a safety incident is reported at one of your schools — how does your team get footage, and how long does that actually take?"',
       '"If you needed to initiate a lockdown across all your campuses right now, how many steps does that take — and where\'s the weakest link in that chain?"',
@@ -583,6 +626,18 @@ const ICPs = [
       'SLC: Intermountain Healthcare, University of Utah Health — major regional multi-hospital systems',
       'Chicago: Northwestern, U of Chicago, Advocate, Loyola — large urban hospital networks with high WPV exposure',
       'Behavioral health networks are the highest-urgency, least-served mid-market segment',
+    ],
+    outreach: [
+      {
+        to: 'Emergency Preparedness Director',
+        subject: 'How many systems does your team coordinate during an active threat?',
+        body: 'Most emergency preparedness directors describe the same friction: cameras in one system, door access in another, alarms in a third. During a workplace violence incident, that fragmentation is measured in seconds. El Centro Regional Medical Center cut WPV incidents 83% after unifying all three into one platform — no servers, no integrator required for day-to-day use. Worth 15 minutes?',
+      },
+      {
+        to: 'Director of Nursing / CNO',
+        subject: 'The gap between a patient fall and your team knowing about it',
+        body: 'Most nursing leadership describe the same scenario: staff respond to falls and aggressive behavior after the fact, not in real time. AI-enabled monitoring that alerts to patient movement or aggression in seconds — without a camera operator watching a screen — is deployable now. If you\'re also navigating how to share footage with HR or risk management while staying HIPAA-compliant, there\'s a specific workflow for that. 15 minutes?',
+      },
     ],
     discovery: [
       '"In your last significant workplace violence incident, how long did it take from the triggering event to having usable footage in hand for HR or law enforcement?"',
@@ -692,6 +747,18 @@ const ICPs = [
       'Chicago: Luxury North Shore retail; large QSR franchise operators; specialty retail HQs',
       'ORC task forces and state legislation are creating non-discretionary upgrade events',
     ],
+    outreach: [
+      {
+        to: 'Director of Asset Protection',
+        subject: 'The ORC suspect who hit three of your stores last month',
+        body: 'If you\'re running store-level DVRs, you have no way of knowing whether the same suspect hit multiple locations until someone manually connects the dots — usually days after the loss. The LP teams flipping this are running AI-based People of Interest alerts: the moment a flagged face enters any store in the chain, the alert fires before the theft. Canadian Tire cut shrinkage 50% using this approach. Worth a conversation?',
+      },
+      {
+        to: 'CFO / Finance Director',
+        subject: 'Your shrinkage number — can you put an ROI on your LP tech?',
+        body: 'Most finance teams can tell you their shrinkage number but not their loss prevention technology ROI. If your current camera infrastructure is store-level only and more than five years old, you\'re likely underinvesting. Cloud-based LP with cross-store AI typically pays back in under three years on shrinkage reduction alone — before factoring in investigation hours saved and integrator contracts eliminated. Happy to model it against your current footprint.',
+      },
+    ],
     discovery: [
       '"Today, if your LP team gets a tip that a known ORC suspect just hit one of your stores — how fast can they pull that footage, and can they see if the same person appeared at any other location?"',
       '"What percentage of your shrinkage do you currently attribute to organized retail crime versus employee theft versus vendor fraud — and how confident are you in that split?"',
@@ -796,6 +863,18 @@ const ICPs = [
       'SLC: Growing multifamily market (tech industry expansion driving new construction)',
       'Chicago: Large commercial RE downtown; significant multifamily expansion in tech corridors',
       'Self-storage networks are an underserved, high-urgency mid-market segment with fast decisions',
+    ],
+    outreach: [
+      {
+        to: 'COO / VP Operations',
+        subject: 'How many vendor logins does your team manage across the portfolio?',
+        body: 'Most property operators we talk to are managing a different camera vendor, access control vendor, and alarm vendor at every property — sometimes 50 to 100+ contracts. Each acquisition adds another. If your team is spending more time managing vendor relationships than managing security outcomes, that\'s a solvable problem. One platform, one contract, plug-and-play across every property. We deployed across a 170-property portfolio in under 12 months. Worth 20 minutes?',
+      },
+      {
+        to: 'VP of Facilities',
+        subject: 'The access control ticket your property manager submitted last Tuesday',
+        body: 'Most facilities directors we talk to have the same problem: a tenant needs access revoked, a vendor needs a one-day credential, someone didn\'t renew their lease — and it requires an IT ticket, a call to an integrator, or a physical site visit. Self-service access control that property managers handle themselves from a phone isn\'t a luxury anymore. Happy to show you what that looks like across a multi-property portfolio.',
+      },
     ],
     discovery: [
       '"Right now, if a tenant at one of your properties reports a security incident at 2am, what\'s the actual process for your team to access that footage — and how long does that take?"',
@@ -904,6 +983,18 @@ const ICPs = [
       'Chicago: Industrial logistics hubs (major US trucking corridor); automotive supply chain; food distribution',
       'Insurance-mandated security upgrades are creating non-discretionary buying events — partner with brokers',
     ],
+    outreach: [
+      {
+        to: 'Plant / Ops Manager',
+        subject: 'The last time your DVR failed during a theft investigation',
+        body: 'Most plant managers we talk to have experienced it: footage that should exist doesn\'t — because the DVR overheated, lost power, or just failed. In a manufacturing or warehouse environment, that\'s a $0 recovery on a cargo theft claim, a gap in your OSHA documentation, or a workers\' comp dispute you can\'t win. Cloud-based systems with no on-site NVR don\'t have this failure mode. We\'ve deployed in environments within feet of 1,400°F industrial ovens. Worth 15 minutes?',
+      },
+      {
+        to: 'VP of EHS / Safety Officer',
+        subject: 'Your OSHA footage retention gap',
+        body: 'Most EHS leaders we talk to know their current system can\'t reliably produce 90+ days of footage on demand for an audit or a disputed injury claim. DVRs overwrite, fail, or simply don\'t have the storage. Continuous cloud recording with up to 365-day retention — paired with heatmap data showing exactly where movement waste and safety violations occur on the floor — changes what you can prove and what you can prevent. 15-minute overview?',
+      },
+    ],
     discovery: [
       '"In the last 12 months, what\'s the dollar value of inventory loss you can directly attribute to theft — and how much more do you suspect went undetected before the next inventory audit?"',
       '"If cargo went missing from a loading dock overnight, what\'s your investigation process — and how quickly can you produce footage for law enforcement or an insurance claim?"',
@@ -1011,6 +1102,18 @@ const ICPs = [
       'Chicago: Midwest regional banks and credit union networks — large suburban and urban branch footprints with active PCI DSS pressure',
       'Compliance-mandated security upgrades are creating non-discretionary buying events at smaller institutions with no dedicated physical security IT staff',
     ],
+    outreach: [
+      {
+        to: 'Fraud Prevention Lead',
+        subject: 'The ATM footage gap you won\'t find until you need it',
+        body: 'Most fraud teams don\'t discover a DVR coverage gap at their ATMs until they\'re mid-investigation — and the recording either failed, overwrote, or captured at too low a resolution to be usable. By then, the jackpotting or skimming window is closed and law enforcement needs footage you can\'t produce. Cloud-based 90-day retention with People of Interest alerts that fire when a known fraudster enters any branch — before the transaction — is a different posture entirely. Worth 15 minutes?',
+      },
+      {
+        to: 'Compliance Manager',
+        subject: 'Which branches have PCI DSS coverage gaps right now — do you know?',
+        body: 'Most compliance managers at regional banks and credit unions are manually verifying that each branch DVR is recording — or relying on someone at the branch to flag when it\'s not. That\'s not a compliance posture; it\'s a liability. Centralized health monitoring with automatic 90-day retention for every cash-handling area, audit-ready without manual verification, is how this gets solved across 50–300 locations. Happy to walk through what that looks like.',
+      },
+    ],
     discovery: [
       '"In the last 12 months, have any of your ATMs or teller areas been targeted by skimming or jackpotting — and when you needed footage for law enforcement, how quickly could you produce it?"',
       '"How do you currently verify that 100% of your cash-handling areas have continuous video coverage for your PCI DSS audits — and what happens if a branch DVR goes down silently for three days?"',
@@ -1117,6 +1220,18 @@ const ICPs = [
       'SLC: Salt Lake City PD, Utah County Sheriff, UTA transit police — Axon is dominant in Utah law enforcement, making the integration wedge immediately actionable on first call',
       'Chicago: Suburban Cook, DuPage, and Will county departments — high crime pressure driving RTCC investment; Axon widely deployed across the corridor',
       'University campus police in both territories (SLED sub-vertical) — Title IV funding cycles, active shooter response requirements, Clery Act reporting obligations',
+    ],
+    outreach: [
+      {
+        to: 'Chief of Police / Sheriff',
+        subject: 'How long does it take your investigators to reconstruct a crime timeline?',
+        body: 'Most police leadership we talk to describe the same bottleneck: pulling footage from multiple operators, businesses, and city systems to reconstruct a 10-minute event takes 4–6 hours of investigator time. AI forensic search that scans an entire camera network by clothing description, vehicle, or face match in seconds is deployed in agencies your size right now. If you\'re also on Axon Evidence.com, the integration to get live video directly into case management is native. Worth 20 minutes?',
+      },
+      {
+        to: 'Lt. of RTCC / Operations Center',
+        subject: 'How many systems does your RTCC log into during an active call?',
+        body: 'Most RTCC commanders describe the same friction: dispatch has to call a camera operator, log into a separate system, or coordinate by phone to get eyes on an active scene. A live shareable link — pushed to responding units before they arrive — changes the response dynamic entirely. We integrate natively with Axon Fusus for agencies building toward a unified command feed. If that\'s the direction you\'re heading, worth a conversation.',
+      },
     ],
     discovery: [
       '"Right now, if a pursuit or active incident unfolds near a city camera, how does your RTCC or dispatch get eyes on that feed — and how many systems do they have to log into to make that happen?"',
@@ -1319,6 +1434,24 @@ function renderPanels() {
           <div class="cb">
             <div class="opp-list">
               ${icp.opp.map(o=>`<div class="opp-item">${o}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Initial Outreach -->
+        <div class="card c-outreach">
+          <div class="ch hd-emerald">
+            <span class="ch-icon">✉️</span>
+            <div><div class="ch-title">Initial Outreach</div><div class="ch-sub">Cold email copy — problem-first, no fluff, ready to send</div></div>
+          </div>
+          <div class="cb">
+            <div class="email-grid">
+              ${icp.outreach.map(e => `
+                <div class="email-item">
+                  <div class="email-to">To: ${e.to}</div>
+                  <div class="email-subject">${e.subject}</div>
+                  <div class="email-body">${e.body}</div>
+                </div>`).join('')}
             </div>
           </div>
         </div>
